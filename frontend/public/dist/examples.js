@@ -13,6 +13,7 @@ catch(e) {
 var noteTextarea = $('#note-textarea');
 var instructions = $('#recording-instructions');
 var notesList = $('ul#notes');
+var recording = false;
 
 var noteContent = '';
 
@@ -74,17 +75,28 @@ recognition.onerror = function(event) {
 ------------------------------*/
 
 $('#start-record-btn').on('click', function(e) {
-  if (noteContent.length) {
-    noteContent += ' ';
-  }
-  recognition.start();
+	$('#start-record-btn').empty();
+	if(recording==false){
+		  if (noteContent.length) {
+		    noteContent += ' ';
+		  }
+		  recording = true;
+		  $('#start-record-btn').append("Pause Recording");
+		  recognition.start();
+	}
+	else{
+		$('#start-record-btn').append("Start Recording");
+		recording = false;
+		recognition.stop();
+		instructions.text('Voice recognition paused.');
+
+	}
 });
 
-
-$('#pause-record-btn').on('click', function(e) {
-  recognition.stop();
-  instructions.text('Voice recognition paused.');
-});
+$('#clear-record-btn').on('click', function(e){
+	$('#note-textarea').val('');
+	noteContent = '';
+})
 
 // Sync the text inside the text area with the noteContent variable.
 noteTextarea.on('input', function() {
@@ -200,4 +212,28 @@ function getAllNotes() {
 function deleteNote(dateTime) {
   localStorage.removeItem('note-' + dateTime); 
 }
+
+
+// ---------------------------- Image to text ---------------------
+
+$("#but_upload").click(function(){
+      var fd = new FormData();
+      var files = $('#file')[0].files[0];
+      if(files == undefined ){
+        alert("Please insert an image");
+      }
+      else {
+        fd.append('file',files);
+        $.ajax({
+            url: '/endpoint',
+            type: 'post',
+            data: fd,
+            contentType: false,
+            processData: false,
+            success: function(response){
+              console.log(response);
+            },
+        });
+      }
+    });
 
