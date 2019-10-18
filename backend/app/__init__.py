@@ -15,4 +15,4 @@ api = Api(blueprint,
 
 api.add_namespace(book_ns, path='/book')
 api.add_namespace(notes_ns, path='/notes')
-api.add_namespace(sign_ns, path='/signs')
+api.add_namespace(sign_ns, path='/sign')
