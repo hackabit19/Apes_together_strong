@@ -4,10 +4,14 @@ import cv2
 import operator
 import numpy as np
 import math
+import wave
+import json
+from xml.etree import ElementTree
 
 _url = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0/RecognizeText'
 _key = "90101da0eaa3442d8f2e21bb4106b5bf"
 _maxNumRetries = 10
+subscription_key = "c49df94e6fc84d3a93768d94524f0007"
 
 def processRequest( json, data, headers, params ):
     retries = 0
@@ -53,8 +57,8 @@ def getOCRTextResult( operationLocation, headers ):
         break
     return result
 
-def gimme_text_and_bounding_boxs(file):
-    pathToFileInDisk = file
+def gimme_text_and_bounding_boxs(img_path):
+    pathToFileInDisk = img_path
     with open(pathToFileInDisk, 'rb') as f:
         data = f.read()
     # Computer Vision parameters
@@ -133,10 +137,49 @@ def gimme_the_final_text(text_with_types):
             text_to_be_spoken += text_block[1]
     return text_to_be_spoken
 
-img_path = r"./4_hand.png"
-shp =  cv2.imread(img_path).shape
-column_len = shp[0]
-row_len = shp[1]
-text_bnd_boxs_result = gimme_text_and_bounding_boxs(img_path)
-text_with_types = gimme_proper_text(text_bnd_boxs_result, column_len, row_len)
-text_to_be_spoken = gimme_the_final_text(text_with_types)
+def get_my_audio_token(subscription_key):
+    fetch_token_url = "https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken"
+    headers = {
+        'Ocp-Apim-Subscription-Key': subscription_key
+    }
+    response = requests.post(fetch_token_url, headers=headers)
+    return str(response.text)
+
+def save_audio(access_token, text_to_be_spoken):
+    # all_audio = []
+    base_url = 'https://westus.tts.speech.microsoft.com/'
+    path = 'cognitiveservices/v1'
+    constructed_url = base_url + path
+    headers = {
+        'Authorization': 'Bearer ' + access_token,
+        'Content-Type': 'application/ssml+xml',
+        'X-Microsoft-OutputFormat': 'riff-24khz-16bit-mono-pcm',
+        'User-Agent': 'YOUR_RESOURCE_NAME'
+    }
+    xml_body = ElementTree.Element('speak', version='1.0')
+    xml_body.set('{http://www.w3.org/XML/1998/namespace}lang', 'en-us')
+    voice = ElementTree.SubElement(xml_body, 'voice')
+    voice.set('{http://www.w3.org/XML/1998/namespace}lang', 'en-US')
+    voice.set('name', 'en-US-Guy24kRUS') # Short name for 'Microsoft Server Speech Text to Speech Voice (en-US, Guy24KRUS)'
+    voice.text = text_to_be_spoken
+    body = ElementTree.tostring(xml_body)
+    response = requests.post(constructed_url, headers=headers, data=body)
+    if response.status_code == 200:
+        with open('sample' + '.wav', 'wb') as audio:
+            audio.write(response.content)
+            # all_audio.append('sample-' + self.timestr + '.wav')
+            print("\nStatus code: " + str(response.status_code) + "\nYour TTS is ready for playback.\n")
+    else:
+        print("\nStatus code: " + str(response.status_code) + "\nSomething went wrong. Check your subscription key and headers.\n")
+        print("Reason: " + str(response.reason) + "\n")
+
+if __name__ == "__main__":
+    img_path = r"./2hand_.png"
+    shp =  cv2.imread(img_path).shape
+    column_len = shp[0]
+    row_len = shp[1]
+    text_bnd_boxs_result = gimme_text_and_bounding_boxs(img_path)
+    text_with_types = gimme_proper_text(text_bnd_boxs_result, column_len, row_len)
+    text_to_be_spoken = gimme_the_final_text(text_with_types)
+    access_token = get_my_audio_token(subscription_key)
+    save_audio(access_token, text_to_be_spoken)
