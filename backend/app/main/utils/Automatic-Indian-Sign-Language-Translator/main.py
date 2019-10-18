@@ -46,48 +46,48 @@ def func(url_to_audio=None):
     arr=['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r',
     's','t','u','v','w','x','y','z']
     with sr.AudioFile(os.path.join(dir_path, 'test.wav')) as source:
-            r.adjust_for_ambient_noise(source)
-            i=0
-            r.pause_threshold = 3
-            audio = r.listen(source)
+        r.adjust_for_ambient_noise(source)
+        i=0
+        r.pause_threshold = 3
+        audio = r.listen(source)
 
-            # recognize speech using Sphinx
-            a=r.recognize_google(audio)
-            print("you said " + a.lower())
+        # recognize speech using Sphinx
+        a=r.recognize_google(audio)
+        print("you said " + a.lower())
 
-            for c in string.punctuation:
-                a= a.replace(c,"")
+        for c in string.punctuation:
+            a= a.replace(c,"")
 
-            if a.lower() in isl_gif:
-                print(os.path.join(dir_path, 'ISL_Gifs/{0}.gif'.format(a.lower())))
-                return os.path.join(dir_path, 'ISL_Gifs/{0}.gif'.format(a.lower()))
-            else:
-                images = []
-                for i in range(len(a)):
-                    if a[i] in arr:
-                        ImageAddress = os.path.join(dir_path, 'letters/'+a[i]+'.jpg')
-                        images.append(ImageAddress)
-                        # ImageItself = Image.open(ImageAddress)
-                        # ImageNumpyFormat = np.asarray(ImageItself)
-                        # plt.imshow(ImageNumpyFormat)
-                        # plt.draw()
-                        # plt.pause(0.8) # pause how many seconds
-                        #plt.close()
-                    else:
-                        continue
-                video_name = 'output.avi'
-                frame = cv2.imread(images[0])
-                height, width, layers = frame.shape
+        if a.lower() in isl_gif:
+            print(os.path.join(dir_path, 'ISL_Gifs/{0}.gif'.format(a.lower())))
+            return os.path.join(dir_path, 'ISL_Gifs/{0}.gif'.format(a.lower()))
+        else:
+            images = []
+            for i in range(len(a)):
+                if a[i] in arr:
+                    ImageAddress = os.path.join(dir_path, 'letters/'+a[i]+'.jpg')
+                    images.append(ImageAddress)
+                    # ImageItself = Image.open(ImageAddress)
+                    # ImageNumpyFormat = np.asarray(ImageItself)
+                    # plt.imshow(ImageNumpyFormat)
+                    # plt.draw()
+                    # plt.pause(0.8) # pause how many seconds
+                    #plt.close()
+                else:
+                    continue
+            video_name = 'output.avi'
+            frame = cv2.imread(images[0])
+            height, width, layers = frame.shape
 
-                video = cv2.VideoWriter(video_name, cv2.VideoWriter_fourcc(*'XVID'), 30, (width, height))
+            video = cv2.VideoWriter(video_name, cv2.VideoWriter_fourcc(*'XVID'), 30, (width, height))
 
-                for image in images:
-                    for _ in range(20):
-                        video.write(cv2.imread(image))
+            for image in images:
+                for _ in range(20):
+                    video.write(cv2.imread(image))
 
-                cv2.destroyAllWindows()
-                video.release()
-                print(os.path.join(dir_path, 'output.avi'))
-                return os.path.join(dir_path, 'output.avi')
+            cv2.destroyAllWindows()
+            video.release()
+            print(os.path.join(dir_path, 'output.avi'))
+            return os.path.join(dir_path, 'output.avi')
 
 # func()
