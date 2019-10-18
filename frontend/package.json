@@ -1,0 +1,20 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "web app for connectall",
+  "main": "index.js",
+  "scripts": {
+    "build": "my-framework build --output public",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Apes",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hackabit19/Apes_together_strong.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hackabit19/Apes_together_strong/issues"
+  },
+  "homepage": "https://github.com/hackabit19/Apes_together_strong#readme"
+}
