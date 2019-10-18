@@ -10,6 +10,9 @@ flask = "*"
 flask-restplus = "*"
 flask-cors = "*"
 flask-script = "*"
+camera = "*"
+imutils = "*"
+opencv-contrib-python = "*"
 
 [requires]
 python_version = "3.7"
