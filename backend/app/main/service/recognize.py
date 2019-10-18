@@ -10,11 +10,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # tf.logging.set_verbosity(tf.logging.ERROR)
 # classifier = tf.estimator.Estimator(model_dir="tmp/cnn_model3", model_fn=cnn_model_fn)
 prediction = None
-model = load_model('cnn_model_keras2.h5')
+dir_path = os.path.dirname(os.path.realpath(__file__))
+model = load_model(os.path.join(dir_path,'cnn_model_keras2.h5'))
 
 
 def get_image_size():
-    img = cv2.imread('100.jpg', 0)
+    img = cv2.imread(os.path.join(dir_path,'100.jpg'), 0)
     return img.shape
 
 
@@ -55,7 +56,7 @@ def keras_predict(model, image):
 
 
 def get_pred_text_from_db(pred_class):
-    conn = sqlite3.connect("gesture_db.db")
+    conn = sqlite3.connect(os.path.join(dir_path,"gesture_db.db"))
     cmd = "SELECT g_name FROM gesture WHERE g_id=" + str(pred_class)
     cursor = conn.execute(cmd)
     for row in cursor:
@@ -90,16 +91,17 @@ def put_splitted_text_in_blackboard(blackboard, splitted_text):
 
 
 def get_hand_hist():
-    with open("hist", "rb") as f:
+    with open(os.path.join(dir_path,"hist"), "rb") as f:
         hist = pickle.load(f)
     return hist
 
 
-def recognize():
+def recognize(cam=None):
     global prediction
-    cam = cv2.VideoCapture(1)
-    if cam.read()[0] == False:
-        cam = cv2.VideoCapture(0)
+    if cam is None:
+        cam = cv2.VideoCapture(1)
+        if cam.read()[0] == False:
+            cam = cv2.VideoCapture(0)
     hist = get_hand_hist()
     x, y, w, h = 300, 100, 300, 300
     while True:
@@ -148,9 +150,10 @@ def recognize():
         # cv2.putText(blackboard, text, (30, 200), cv2.FONT_HERSHEY_TRIPLEX, 1.3, (255, 255, 255))
         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
         res = np.hstack((img, blackboard))
-        cv2.imshow("Recognizing gesture", res)
-        cv2.imshow("thresh", thresh)
-        if cv2.waitKey(1) == ord('q'):
-            break
+        # cv2.imshow("Recognizing gesture", res)
+        return res
+        # cv2.imshow("thresh", thresh)
+        # if cv2.waitKey(1) == ord('q'):
+        #     break
 keras_predict(model, np.zeros((50, 50), dtype=np.uint8))
-recognize()
+# recognize()
