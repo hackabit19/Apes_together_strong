@@ -178,20 +178,24 @@ class TextToSpeech(object):
 		else:
 			print("\nStatus code: " + str(response.status_code) + "\nSomething went wrong. Check your subscription key and headers.\n")
 
-url = "https://arxiv.org/pdf/1601.07255.pdf"
-content = urllib.request.urlopen(url).read()
-filename = "pdfExample.pdf"
-fout = open(filename, "wb")
-fout.write(content)
-fout.close()
+def narrate_book(url):
+	content = urllib.request.urlopen(url).read()
+	filename = "pdfExample.pdf"
+	fout = open(filename, "wb")
+	fout.write(content)
+	fout.close()
 
-images = pdf2image.convert_from_path(filename)
-print(len(images))
-all_text = ""
-for image in images:
-	image_data = pil_to_array(image)
-	new_page = text_from_image(image_data)
-	all_text += new_page
-	app = TextToSpeech(new_page, subscription_key)
-	app.get_token()
-	app.save_audio()
+	images = pdf2image.convert_from_path(filename)
+	print(len(images))
+	all_text = ""
+	for image in images:
+		image_data = pil_to_array(image)
+		new_page = text_from_image(image_data)
+		all_text += new_page
+		app = TextToSpeech(new_page, subscription_key)
+		app.get_token()
+		app.save_audio()
+
+if __name__ = "__main__":
+	url = "https://arxiv.org/pdf/1601.07255.pdf"
+	narrate_book(url)
