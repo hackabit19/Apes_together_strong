@@ -1,6 +1,7 @@
 import requests
 import pdf2image
 import PyPDF2
+import wave
 from PIL import Image
 import urllib
 import io
@@ -122,6 +123,8 @@ def text_from_image(image_data):
 	# return text_file
 
 subscription_key = "c49df94e6fc84d3a93768d94524f0007"
+
+all_audio = []
 # Here you have to paste the key for azure speech api
 class TextToSpeech(object):
 	def __init__(self, to_be_spoken, subscription_key):
@@ -160,6 +163,7 @@ class TextToSpeech(object):
 		if response.status_code == 200:
 			with open('sample-' + self.timestr + '.wav', 'wb') as audio:
 				audio.write(response.content)
+				all_audio.append('sample-' + self.timestr + '.wav')
 				print("\nStatus code: " + str(response.status_code) + "\nYour TTS is ready for playback.\n")
 		else:
 			print("\nStatus code: " + str(response.status_code) + "\nSomething went wrong. Check your subscription key and headers.\n")
@@ -196,6 +200,21 @@ def narrate_book(url):
 		app.get_token()
 		app.save_audio()
 
-if __name__ = "__main__":
+def combine_all_audio():
+	data = []
+	outfile = "narration.wav"
+	for infile in all_audio:
+		w = wave.open(infile, 'rb')
+		data.append( [w.getparams(), w.readframes(w.getnframes())] )
+		w.close()
+
+	output = wave.open(outfile, 'wb')
+	output.setparams(data[0][0])
+	output.writeframes(data[0][1])
+	output.writeframes(data[1][1])
+	output.close()
+
+if __name__ == "__main__":
 	url = "https://arxiv.org/pdf/1601.07255.pdf"
 	narrate_book(url)
+	combine_all_audio()
