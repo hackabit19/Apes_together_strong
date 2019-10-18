@@ -1,5 +1,6 @@
 from imutils.video import VideoStream
 import threading
+from app.main.service.recognize import recognize
 import time
 import cv2
 
@@ -8,12 +9,16 @@ lock = threading.Lock()
 
 def gen():
     global outputFrame
-    vs = VideoStream(src=0).start()
+    cam = cv2.VideoCapture(1)
+    if cam.read()[0] == False:
+        cam = cv2.VideoCapture(0)
+    # vs = VideoStream(src=0).start()
+    vs = cam
     time.sleep(1.0)
     while True:
-        frame = vs.read()
+        # frame = vs.read()
         with lock:
-            outputFrame = frame.copy()
+            outputFrame = recognize(vs)
             if outputFrame is None:
                 continue
             (flag, encodedImage) = cv2.imencode(".jpg", outputFrame)
