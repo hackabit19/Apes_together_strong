@@ -182,7 +182,7 @@ class TextToSpeech(object):
 		else:
 			print("\nStatus code: " + str(response.status_code) + "\nSomething went wrong. Check your subscription key and headers.\n")
 
-def narrate_book(url):
+def narrate_book(url):     #This function returns text from the book.
 	content = urllib.request.urlopen(url).read()
 	filename = "pdfExample.pdf"
 	fout = open(filename, "wb")
@@ -199,6 +199,7 @@ def narrate_book(url):
 		app = TextToSpeech(new_page, subscription_key)
 		app.get_token()
 		app.save_audio()
+	return all_text
 
 def combine_all_audio():
 	data = []
@@ -216,5 +217,5 @@ def combine_all_audio():
 
 if __name__ == "__main__":
 	url = "https://arxiv.org/pdf/1601.07255.pdf"
-	narrate_book(url)
+	all_text = narrate_book(url)
 	combine_all_audio()
