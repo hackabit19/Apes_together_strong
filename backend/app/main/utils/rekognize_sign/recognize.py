@@ -1,14 +1,14 @@
-import cv2, pickle
+import cv2, pickle, os
 import numpy as np
 import tensorflow as tf
-from cnn_tf import cnn_model_fn
+# from cnn_tf import cnn_model_fn
 import os
 import sqlite3
 from keras.models import load_model
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # tf.logging.set_verbosity(tf.logging.ERROR)
-classifier = tf.estimator.Estimator(model_dir="tmp/cnn_model3", model_fn=cnn_model_fn)
+# classifier = tf.estimator.Estimator(model_dir="tmp/cnn_model3", model_fn=cnn_model_fn)
 prediction = None
 model = load_model('cnn_model_keras2.h5')
 
@@ -28,16 +28,16 @@ def tf_process_image(img):
     return np_array
 
 
-def tf_predict(classifier, image):
-    '''
-    need help with prediction using tensorflow
-    '''
-    global prediction
-    processed_array = tf_process_image(image)
-    pred_input_fn = tf.estimator.inputs.numpy_input_fn(x={"x": processed_array}, shuffle=False)
-    pred = classifier.predict(input_fn=pred_input_fn)
-    prediction = next(pred)
-    print(prediction)
+# def tf_predict(classifier, image):
+#     '''
+#     need help with prediction using tensorflow
+#     '''
+#     global prediction
+#     processed_array = tf_process_image(image)
+#     pred_input_fn = tf.estimator.inputs.numpy_input_fn(x={"x": processed_array}, shuffle=False)
+#     pred = classifier.predict(input_fn=pred_input_fn)
+#     prediction = next(pred)
+#     print(prediction)
 
 
 def keras_process_image(img):
@@ -152,7 +152,5 @@ def recognize():
         cv2.imshow("thresh", thresh)
         if cv2.waitKey(1) == ord('q'):
             break
-
-
 keras_predict(model, np.zeros((50, 50), dtype=np.uint8))
 recognize()
