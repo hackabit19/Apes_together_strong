@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/hackabit19/Apes_together_strong/issues"
   },
-  "homepage": "https://github.com/hackabit19/Apes_together_strong#readme"
+  "homepage": "https://github.com/hackabit19/Apes_together_strong#readme",
+  "dependencies": {
+    "now": "^16.3.1"
+  }
 }
