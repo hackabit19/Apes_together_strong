@@ -6,6 +6,8 @@ import numpy as np
 import math
 import wave
 import json
+import urllib
+import shutil
 from xml.etree import ElementTree
 
 _url = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0/RecognizeText'
@@ -146,7 +148,6 @@ def get_my_audio_token(subscription_key):
     return str(response.text)
 
 def save_audio(access_token, text_to_be_spoken):
-    # all_audio = []
     base_url = 'https://westus.tts.speech.microsoft.com/'
     path = 'cognitiveservices/v1'
     constructed_url = base_url + path
@@ -173,8 +174,11 @@ def save_audio(access_token, text_to_be_spoken):
         print("\nStatus code: " + str(response.status_code) + "\nSomething went wrong. Check your subscription key and headers.\n")
         print("Reason: " + str(response.reason) + "\n")
 
-if __name__ == "__main__":
-    img_path = r"./2hand_.png"
+def note_make(url, img_path = "sample.jpg"):
+    resp = requests.get(url, stream=True)
+    local_file = open(img_path, "wb")
+    resp.raw.decode_content = True
+    shutil.copyfileobj(resp.raw, local_file)
     shp =  cv2.imread(img_path).shape
     column_len = shp[0]
     row_len = shp[1]
@@ -183,3 +187,7 @@ if __name__ == "__main__":
     text_to_be_spoken = gimme_the_final_text(text_with_types)
     access_token = get_my_audio_token(subscription_key)
     save_audio(access_token, text_to_be_spoken)
+
+if __name__ == "__main__":
+    url = "https://imgur.com/download/jwiBl0z"
+    note_make(url, "1hand.jpg")
