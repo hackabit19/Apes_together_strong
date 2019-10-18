@@ -13,6 +13,12 @@ flask-script = "*"
 camera = "*"
 imutils = "*"
 opencv-contrib-python = "*"
+h5py = "*"
+numpy = "*"
+scikit-learn = "*"
+sklearn = "*"
+opencv-python = "*"
+pyttsx3 = "*"
 
 [requires]
 python_version = "3.7"
