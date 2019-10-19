@@ -39,9 +39,32 @@
 							<h2>Narration</h2>
 							<p>Text to speech narration</p>
 						</header>
-						<section class="wrapper style5">
+						<section class="wrapper style3 special">
 							<div class="inner">
-							</div>
+							<header class="major">
+								<h2>Add link to image</h2>
+								<form method="get" action="#">
+										<div class="row gtr-uniform">
+											<div class="col-2 col-12-xsmall"></div>
+											<div class="col-6 col-12-xsmall">
+												<input id="img_url" type="text" name="demo-name" id="demo-name" value="" placeholder="URL" />
+											</div>
+											<div class="col-2 col-12-xsmall ">
+												<a onclick=narration() class="button primary">Send</a>
+											</div>
+											<div class="col-2 col-12-xsmall"></div>
+										</div>
+									</form>
+								<div id="spinner" hidden="true">
+									<div style="align-self: center !important;" class="lds-heart"><div></div></div>
+								</div>
+							</header>
+							<h3>Audio</h3>
+							<p>Audio response of the provided note</p>
+							<audio id="aud_res" src="" controls>
+										Your browser does not support the audio element.
+							</audio>
+						</div>
 						</section>
 					</article>
 
@@ -69,7 +92,6 @@
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
-			<script src="assets/js/speech2text.js"></script>
 
 	</body>
 </html>

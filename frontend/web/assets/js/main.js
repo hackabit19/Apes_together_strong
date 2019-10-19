@@ -1,3 +1,5 @@
+var back_url = "https://494c0b1d.ngrok.io/";
+
 (function($) {
 
 	var	$window = $(window),
@@ -88,3 +90,59 @@ function closeNav() {
   document.getElementById("myNav").style.width = "0%";
   $("#def"+defnav).toggle();
 }
+
+// ///////////////////////// AJAX ///////////////////////////////
+
+function transcription(){
+      var url = $("#img_url").val();
+      $("#spinner").toggle();
+      $.ajax({
+          url: back_url+"notes/web?url="+url,
+          type: 'get',
+          data: url,
+          processData: false,
+          crossDomain: true,
+          contentType: "application/json",
+          success: function(response){
+          	console.log(response);
+          	$("#spinner").toggle();
+            $("#aud_res").attr("src","data:audio/ogg;base64," + response.audio);
+            $("#img_res").attr("src","data:image/jpg;base64," + response.image);
+          },
+      });
+    }
+
+function narration(){
+  var url = $("#img_url").val();
+  $("#spinner").toggle();
+      $.ajax({
+          url: back_url+"book/web?url="+url,
+          type: 'get',
+          processData: false,
+          crossDomain: true,
+          contentType: "application/json",
+          success: function(response){
+            console.log(response);
+            $("#spinner").toggle();
+            $("#aud_res").attr("src","data:audio/ogg;base64," + response.audio)
+          },
+      });
+}
+
+function narration(){
+  var url = $("#img_url").val();
+  $("#spinner").toggle();
+      $.ajax({
+          url: back_url+"sign/web?url="+url,
+          type: 'get',
+          processData: false,
+          crossDomain: true,
+          contentType: "application/json",
+          success: function(response){
+            console.log(response);
+            $("#spinner").toggle();
+            $("#vid_res").attr("src","data:video/ogg;base64," + response.audio)
+          },
+      });
+}
+
