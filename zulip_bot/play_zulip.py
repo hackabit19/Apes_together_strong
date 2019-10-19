@@ -11,7 +11,7 @@ import urllib
 # from notes_service import note_make
 
 BOT_MAIL = "bhat-bot@zulipchat.com"
-app_url = "http://59f849ef.ngrok.io/"
+app_url = "https://494c0b1d.ngrok.io/"
 
 class ZulipBot(object):
 	def __init__(self):
