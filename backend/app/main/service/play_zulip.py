@@ -6,6 +6,7 @@ import httplib2
 import os
 from googletrans import Translator
 from book_service import narrate_book
+from notes_service import note_make
 
 BOT_MAIL = "bhat-bot@zulipchat.com"
 
@@ -46,19 +47,30 @@ class ZulipBot(object):
                 })
             elif content[1].lower() in ["narrate_book", "narrate_note", "create_signs"]:
                 command_type = content[1].lower()
+                message = "Processing_your request..."
+                self.client.send_message({
+                    "type": "stream",
+                    "subject": msg["subject"],
+                    "to": msg["display_recipient"],
+                    "content": message
+                })
 
                 if command_type == "narrate_book":
                     audio_path = narrate_book(content[2], sound=True)
-                    print("Don't worry, I will take forever to upload this file.")
+                    message = "Uploading your file..."
+                    self.client.send_message({
+                        "type": "stream",
+                        "subject": msg["subject"],
+                        "to": msg["display_recipient"],
+                        "content": message
+                    })
                     with open(audio_path, 'rb') as fp:
                         result = self.client.call_endpoint(
                             'user_uploads',
                             method='POST',
                             files=[fp]
                         )
-                    bot_handler.
-                    message = "https://apes-together-strong.zulipchat.com" + result["uri"]
-
+                    message = "Here is your audio file https://apes-together-strong.zulipchat.com" + result["uri"]
                     self.client.send_message({
                         "type": "stream",
                         "subject": msg["subject"],
@@ -66,14 +78,37 @@ class ZulipBot(object):
                         "content": message
                     })
 
-                # message = self.trans.translate(command_type, ip)
 
-                # self.client.send_message({
-                #     "type": "stream",
-                #     "subject": msg["subject"],
-                #     "to": msg["display_recipient"],
-                #     "content": message
-                # })
+
+
+                if command_type == "narrate_note":
+                    audio_path = note_make(content[2])
+                    message = "Uploading your file..."
+                    self.client.send_message({
+                        "type": "stream",
+                        "subject": msg["subject"],
+                        "to": msg["display_recipient"],
+                        "content": message
+                    })
+                    with open(audio_path, 'rb') as fp:
+                        result = self.client.call_endpoint(
+                            'user_uploads',
+                            method='POST',
+                            files=[fp]
+                        )
+                    message = "Here is your audio file https://apes-together-strong.zulipchat.com" + result["uri"]
+                    self.client.send_message({
+                        "type": "stream",
+                        "subject": msg["subject"],
+                        "to": msg["display_recipient"],
+                        "content": message
+                    })
+
+
+
+
+                if command_type == "create_signs":
+                    pass
 
 def main():
     bot = ZulipBot()
