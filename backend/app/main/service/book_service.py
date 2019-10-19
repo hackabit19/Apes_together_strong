@@ -276,4 +276,4 @@ def slow_down_audio(audio_file, Change_RATE):
 if __name__ == "__main__":
 	url = "https://arxiv.org/pdf/1601.07255.pdf"
 	all_audio = narrate_book(url, True)   #If you only want text, give second arg False
-	slow_down_audio(all_audio, 0.7)
+	#slow_down_audio(all_audio, 0.9)
