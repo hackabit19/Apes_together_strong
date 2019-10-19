@@ -143,6 +143,8 @@ def recognize(cam=None):
 
                 if pred_probab * 100 > 80:
                     text = get_pred_text_from_db(pred_class)
+                    if text.lower() == 'fuck':
+                        text = 'Love'
                     print(text)
         blackboard = np.zeros((480, 640, 3), dtype=np.uint8)
         splitted_text = split_sentence(text, 2)
