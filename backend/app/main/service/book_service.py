@@ -1,3 +1,4 @@
+import os
 import requests
 import pdf2image
 import PyPDF2
@@ -8,6 +9,7 @@ import io
 import time
 import cv2
 import operator
+import requests
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D 
@@ -86,6 +88,34 @@ def showResultinFile(result):
 		texty += s
 	return texty
 
+def showResultOnImage( result, img ):
+	img = img[:, :, (2, 1, 0)]
+	fig, ax = plt.subplots(figsize=(12, 12))
+	ax.imshow(img, aspect='equal')
+
+	lines = result['recognitionResult']['lines']
+
+	for i in range(len(lines)):
+		words = lines[i]['words']
+		for j in range(len(words)):
+			tl = (words[j]['boundingBox'][0], words[j]['boundingBox'][1])
+			tr = (words[j]['boundingBox'][2], words[j]['boundingBox'][3])
+			br = (words[j]['boundingBox'][4], words[j]['boundingBox'][5])
+			bl = (words[j]['boundingBox'][6], words[j]['boundingBox'][7])
+			text = words[j]['text']
+			x = [tl[0], tr[0], tr[0], br[0], br[0], bl[0], bl[0], tl[0]]
+			y = [tl[1], tr[1], tr[1], br[1], br[1], bl[1], bl[1], tl[1]]
+			line = Line2D(x, y, linewidth=3.5, color='red')
+			ax.add_line(line)
+			ax.text(tl[0], tl[1] - 2, '{:s}'.format(text),
+			bbox=dict(facecolor='blue', alpha=0.5),
+			fontsize=14, color='white')
+
+	plt.axis('off')
+	plt.tight_layout()
+	plt.draw()
+	plt.show()
+
 def text_from_image(image_data):
 	params = {'mode' : 'Handwritten'}
 	headers = dict()
@@ -95,7 +125,7 @@ def text_from_image(image_data):
 	json = None
 
 	operationLocation = processRequest(json, image_data, headers, params)
-	print("Baahar")
+
 	result = None
 	if (operationLocation != None):
 		headers = {}
@@ -104,15 +134,14 @@ def text_from_image(image_data):
 			time.sleep(1)
 			print("Trying")
 			result = getOCRTextResult(operationLocation, headers)
-			print("Nikal Lawde")
 			if result['status'] == 'Succeeded' or result['status'] == 'Failed':
 				break
 	text_file = []
 	if result is not None and result['status'] == 'Succeeded':
 		data8uint = np.fromstring(image_data, np.uint8)
 		img = cv2.cvtColor(cv2.imdecode(data8uint, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
+		# showResultOnImage(result, img)
 		return showResultinFile(result)
-	# 	# showResultOnImage(result, img)
 	# 	all_text = result['recognitionResult']['lines']
 	# 	for i in range(len(all_text)):
 	# 		one_line = all_text[i]['words']
@@ -125,6 +154,7 @@ def text_from_image(image_data):
 subscription_key = "c49df94e6fc84d3a93768d94524f0007"
 
 all_audio = []
+i = 0
 # Here you have to paste the key for azure speech api
 class TextToSpeech(object):
 	def __init__(self, to_be_spoken, subscription_key):
@@ -142,6 +172,7 @@ class TextToSpeech(object):
 		self.access_token = str(response.text)
 
 	def save_audio(self):
+		global i
 		base_url = 'https://westus.tts.speech.microsoft.com/'
 		path = 'cognitiveservices/v1'
 		constructed_url = base_url + path
@@ -161,10 +192,10 @@ class TextToSpeech(object):
 
 		response = requests.post(constructed_url, headers=headers, data=body)
 		if response.status_code == 200:
-			with open('sample-' + self.timestr + '.wav', 'wb') as audio:
+			with open('sample-' + str(i) + '.wav', 'wb') as audio:
 				audio.write(response.content)
-				all_audio.append('sample-' + self.timestr + '.wav')
-				print("\nStatus code: " + str(response.status_code) + "\nYour TTS is ready for playback.\n")
+				all_audio.append('sample-' + str(i) + '.wav')
+				print("\nStatus code: " + str(response.status_code) + "\nYour TTS is ready for playback.\n" + 'sample-' + str(i) + '.wav')
 		else:
 			print("\nStatus code: " + str(response.status_code) + "\nSomething went wrong. Check your subscription key and headers.\n")
 			print("Reason: " + str(response.reason) + "\n")
@@ -182,12 +213,13 @@ class TextToSpeech(object):
 		else:
 			print("\nStatus code: " + str(response.status_code) + "\nSomething went wrong. Check your subscription key and headers.\n")
 
-def narrate_book(url):     #This function returns text from the book.
-	content = urllib.request.urlopen(url).read()
+def narrate_book(url, sound=False):     #This function returns text from the book.
+	global i
 	filename = "pdfExample.pdf"
-	fout = open(filename, "wb")
-	fout.write(content)
-	fout.close()
+	r = requests.get(url, allow_redirects=True, stream=True)
+	with open(filename, 'wb') as f:
+		for chunk in r.iter_content():
+			f.write(chunk)
 
 	images = pdf2image.convert_from_path(filename)
 	print(len(images))
@@ -196,26 +228,59 @@ def narrate_book(url):     #This function returns text from the book.
 		image_data = pil_to_array(image)
 		new_page = text_from_image(image_data)
 		all_text += new_page
-		app = TextToSpeech(new_page, subscription_key)
-		app.get_token()
-		app.save_audio()
+		if sound:
+			i += 1
+			app = TextToSpeech(new_page, subscription_key)
+			app.get_token()
+			app.save_audio()
+			# return combine_all_audio()
+
+	i = 0
+	if sound:
+		return combine_all_audio()
 	return all_text
 
 def combine_all_audio():
+	global all_audio
+	dir_path = os.path.dirname(os.path.realpath(__file__))
 	data = []
-	outfile = "narration.wav"
+	outfile = os.path.join(dir_path, "narration.wav")
 	for infile in all_audio:
 		w = wave.open(infile, 'rb')
-		data.append( [w.getparams(), w.readframes(w.getnframes())] )
+		data.append([w.getparams(), w.readframes(w.getnframes())])
 		w.close()
+
+	print('audio elements = '+str(len(data)))
 
 	output = wave.open(outfile, 'wb')
 	output.setparams(data[0][0])
-	output.writeframes(data[0][1])
-	output.writeframes(data[1][1])
+	for data_ele in data:
+		output.writeframes(data_ele[1])
 	output.close()
+	all_audio = []
+	return outfile
+
+def slow_down_audio(audio_file, Change_RATE):
+	dir_path = os.path.dirname(os.path.realpath(__file__))
+	outfile = os.path.join(dir_path, "mod_narration.wav")
+	CHANNELS = 1
+	swidth = 2
+	# Change_RATE = 2
+
+	spf = wave.open(audio_file, 'rb')
+	RATE=spf.getframerate()
+	signal = spf.readframes(-1)
+
+	wf = wave.open(outfile, 'wb')
+	wf.setnchannels(CHANNELS)
+	wf.setsampwidth(swidth)
+	wf.setframerate(RATE*Change_RATE)
+	wf.writeframes(signal)
+	wf.close()
+	return outfile
 
 if __name__ == "__main__":
 	url = "https://arxiv.org/pdf/1601.07255.pdf"
-	all_text = narrate_book(url)
-	combine_all_audio()
+	url = "https://arxiv.org/pdf/1805.08786.pdf"
+	all_audio = narrate_book(url, True)   #If you only want text, give second arg False
+	#slow_down_audio(all_audio, 0.9)

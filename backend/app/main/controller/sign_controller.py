@@ -1,8 +1,9 @@
-from flask import Blueprint, current_app, request, render_template, Response, make_response
+from flask import Blueprint, current_app, request, render_template, Response, make_response, send_file
 from flask_restplus import Api, Resource, Namespace
 
 from app.main.service.sign_service import gen
 from camera import Camera
+from app.main.utils.toSignTranslator.main import func
 
 sign_api = Namespace('sign', description="Sign endpoint")
 
@@ -16,6 +17,15 @@ class VideoTemp(Resource):
     def get(self):
         headers = {'Content-Type': 'text/html'}
         return make_response(render_template('video.html'), 200, headers)
+
+@sign_api.route('/tosign')
+class ToSign(Resource):
+    def get(self):
+        vid_path = func(request.args.get('url'))
+        response = send_file(vid_path, "video/avi", attachment_filename='tosign.avi', as_attachment=True)
+        response.headers["x-filename"] = 'tosign.avi'
+        response.headers["Access-Control-Expose-Headers"] = 'x-filename'
+        return response
 
 @sign_api.route('/camera')
 class VideoFeed(Resource):
