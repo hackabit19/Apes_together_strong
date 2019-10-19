@@ -20,6 +20,12 @@
     <script src="./assets/vendor/popper/popper.min.js"></script>
     <script src="./assets/vendor/bootstrap/bootstrap.min.js" ></script>
 
+        <!-- include FilePond library -->
+        <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
+
+        <!-- include FilePond jQuery adapter -->
+        <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
+
     <script type="text/javascript">
         //using document ready...
         $(document).ready(function(){
@@ -29,6 +35,8 @@
                 sectionsColor: ['#222', '#0798ec', '#fc6c7c', '#fec401'],
                 navigation: true,
                 slidesNavigation: true,
+                verticalCentered: true,
+                css3: false
             });
 
             // calling fullpage.js methods using jQuery
@@ -42,36 +50,52 @@
                 $.fn.fullpage.moveSectionDown();
             });
         });
+
     </script>
 
-    <style type="text/css">
-    #actions{
-        position:fixed;
-        top: 73px;
-        left: 30px;
-        z-index: 99999;
-    }
-    #actions a{
-        background: rgba(0,0,0,0.8);
-        padding: 7px;
-        margin: 2px;
-        color: #ccc;
-        display: inline-block;
-    }
-    #actions a:hover{
+    <style>
+        h1{
+        font-size: 5em;
+        font-family: arial,helvetica;
         color: #fff;
-        background: #81A140;
+        margin:0;
+        padding:0;
+    }
+
+    /* Centered texts in each section
+    * --------------------------------------- */
+    .section{
+        text-align:center;
+    }
+
+
+    /* Backgrounds will cover all the section
+    * --------------------------------------- */
+    #section0{
+        background-size: cover;
+        background-attachment: fixed;
+    }
+
+    /* Defining each sectino background and styles
+    * --------------------------------------- */
+    #section0{
+        background-image: url(res/img.jpg);
+    }
+    #section0 h1{
+        top: 50%;
+        transform: translateY(-50%);
+        position: relative;
     }
     </style>
 </head>
 <body>
 
-<nav class="navbar sticky-top navbar-light bg-light shadow">
-        <a class="navbar-brand">CONNECT ALL</a>
+<nav class="navbar sticky-top navbar-dark bg-dark shadow">
+        <a class="navbar-brand text-white" style="float:left;margin: 0.2em 0.2em; font-size: 24px ;font-family:'navfont';cursor: pointer; ">CONNECT ALL</a>
         <form class="form-inline">
-            <button class="btn btn-outline-success mr-2 my-2 my-sm-0"  type="button">HELP</button>
+            <button class="btn btn-outline-primary mr-2 my-2 my-sm-0"  type="button">HELP</button>
             <!-- <input class="form-control mr-sm-2" type="text" placeholder="USER NAME" aria-label="Name" value="" id="user_name"> -->
-            <button class="btn btn-outline-success my-sm-0 disabled" type="submit">MENU</button>
+            <button class="btn btn-outline-primary my-sm-0" type="button">MENU</button>
         </form>
 </nav>
 
@@ -82,9 +106,9 @@
 
 
 <div id="fullpage">
-    <div class="section">
+    <div class="section" id="section0">
         <div class="container">
-            <div class="card bg-dark text-white w-100 text-center">
+            <div class="card bg-light text-white w-100 text-center shadow">
               <img src="res/img.jpg" class="card-img" alt="..." style="opacity: 0.2;">
               <div class="card-img-overlay align-items-center d-flex justify-content-center">
                   <div class="centered">
@@ -141,11 +165,26 @@
         </div>
     </div>
     <div class="section">
-        <h1>Section 4</h1>
+        <input type="file" class="my-pond" name="filepond"/>
+
+        <script>
+          $(function(){
+
+            // Turn input element into a pond
+            $('.my-pond').filepond();
+          
+            // Listen for addfile event
+            $('.my-pond').on('FilePond:addfile', function(e) {
+                console.log('file added event', e);
+            });
+          
+          });
+        </script>
+
     </div>
 </div>
 
-<script type="text/javascript" src="dist/js/examples.js"></script>
+<script type="text/javascript" src="dist/js/script.js"></script>
 
 </body>
 </html>
