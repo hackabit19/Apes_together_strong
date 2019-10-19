@@ -27,13 +27,19 @@ class ToSign(Resource):
         response.headers["Access-Control-Expose-Headers"] = 'x-filename'
         return response
 
+@sign_api.route('/download')
+class Download(Resource):
+    def get(self):
+        response = send_file(request.args.get('url'), "video/avi", attachment_filename='tosign.avi', as_attachment=True)
+        response.headers["x-filename"] = 'tosign.avi'
+        response.headers["Access-Control-Expose-Headers"] = 'x-filename'
+        return response
+
 @sign_api.route('/web')
 class ToSignWeb(Resource):
     def get(self):
         vid_path = func(request.args.get('url'))
-        with open(vid_path, 'rb') as audio_file:
-            encoded_audio = base64.b64encode(audio_file.read())
-        return {'video': encoded_audio.decode('utf-8')}
+        return {'video': vid_path}
 
 @sign_api.route('/camera')
 class VideoFeed(Resource):

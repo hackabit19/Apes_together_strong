@@ -8,18 +8,24 @@ from itertools import count
 import tkinter as tk
 import string
 import os
+import base64
 import requests
 #import selecting
 # obtain audio from the microphone
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-def func(url_to_audio=None):
+def func(url_to_audio=None, isBase64=False, base64Data = None):
+    if isBase64:
+        img_64 = base64.decodestring(base64Data)
+        with open(os.path.join(dir_path, 'test.wav'), 'wb') as img_file:
+            img_file.write(img_64)
 
-    if url_to_audio is not None:
+    if url_to_audio is not None and isBase64 is False:
         r = requests.get(url_to_audio, allow_redirects=True, stream=True)
         with open(os.path.join(dir_path, 'test.wav'), 'wb') as f:
             for chunk in r.iter_content():
                 f.write(chunk)
+
 
     r = sr.Recognizer()
     isl_gif=['all the best', 'any questions', 'are you angry', 'are you busy', 'are you hungry', 'are you sick', 'be careful',

@@ -30,4 +30,4 @@ class BookNarrationWebAccess(Resource):
         path_to_audio = narrate_book(request.args.get('url'), sound=True)
         with open(path_to_audio, 'rb') as audio_file:
             encoded_image = base64.b64encode(audio_file.read())
-        return {'audio': encoded_image.decode('utf-8')}
+        return {'audio': encoded_image.decode('utf-8', errors='replace')}

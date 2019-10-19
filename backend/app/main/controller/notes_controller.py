@@ -28,14 +28,21 @@ class NotesToAudio(Resource):
         response.headers["Access-Control-Expose-Headers"] = 'x-filename'
         return response
 
+@notes_api.route('/download')
+class Download(Resource):
+    def get(self):
+        response = send_file(request.args.get('url'), "image/jpg", attachment_filename='labelled.jpg', as_attachment=True)
+        response.headers["x-filename"] = 'labelled.jpg'
+        response.headers["Access-Control-Expose-Headers"] = 'x-filename'
+        return response
+
 @notes_api.route('/web')
 class NotesToAudioWeb(Resource):
     def get(self):
         aud_path = note_make(request.args.get('url'))
-        with open(aud_path, 'rb') as audio_file:
+        with open(aud_path, 'rb', encoding='utf-8') as audio_file:
             encoded_audio = base64.b64encode(audio_file.read())
         img_path  = note_make(just_img=True)
-        with open(img_path, 'rb') as image_file:
-            encoded_image = base64.b64decode(image_file.read())
-        return {'audio': encoded_audio.decode('utf-8'), 'image': encoded_image.decode('utf-8')}
+        print(img_path)
+        return {'audio': encoded_audio.decode('utf-8', errors='replace'), 'image': img_path}
 
