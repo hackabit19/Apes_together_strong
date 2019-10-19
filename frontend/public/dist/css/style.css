@@ -15,55 +15,7 @@ body{
 }
 .section{
 	text-align:center;
-}
-#menu li {
-	display:inline-block;
-	margin: 10px;
-	color: #000;
-	background:#fff;
-	background: rgba(255,255,255, 0.5);
-	-webkit-border-radius: 10px;
-            border-radius: 10px;
-}
-#menu li.active{
-	background:#666;
-	background: rgba(0,0,0, 0.5);
-	color: #fff;
-}
-#menu li a{
-	text-decoration:none;
-	color: #000;
-}
-#menu li.active a:hover{
-	color: #000;
-}
-#menu li:hover{
-	background: rgba(255,255,255, 0.8);
-}
-#menu li a,
-#menu li.active a{
-	padding: 9px 18px;
-	display:block;
-}
-#menu li.active a{
-	color: #fff;
-}
-#menu{
-	position:fixed;
-	top:0;
-	left:0;
-	height: 40px;
-	z-index: 70;
-	width: 100%;
-	padding: 0;
-	margin:0;
-}
-.twitter-share-button{
-	position: fixed;
-	z-index: 99;
-	right: 149px;
-	top: 9px;
-}
+
 /*--------------------------------------------------------*/
 
 /* Container holding the image and the text */
@@ -166,13 +118,36 @@ body{
 	        margin-bottom: 10px;
 	    }
 
-	}   
-
-
-
-	/* -- Demo ads -- */
-
-	@media (max-width: 1200px) {
-	    #bsaHolder{ display:none;}
 	}
+}
+
+/*------------------filepond-------------------*/
+
+.filepond--drop-label {
+	color: #4c4e53;
+}
+
+.filepond--label-action {
+	text-decoration-color: #babdc0;
+}
+
+.filepond--panel-root {
+	border-radius: 2em;
+	background-color: #edf0f4;
+	height: 1em;
+}
+
+.filepond--item-panel {
+	background-color: #595e68;
+}
+
+.filepond--drip-blob {
+	background-color: #7f8a9a;
+}
+
+/*--------------------NAV BAR---------------------*/
+
+@font-face {
+   font-family: navfont;
+   src: url(res/font/iconmoon.woff);
 }
