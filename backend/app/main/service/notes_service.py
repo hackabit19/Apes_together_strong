@@ -5,6 +5,7 @@ import operator
 import numpy as np
 import math
 import wave
+import os
 import json
 import urllib
 import shutil
@@ -14,6 +15,7 @@ _url = 'https://westcentralus.api.cognitive.microsoft.com/vision/v2.0/RecognizeT
 _key = "90101da0eaa3442d8f2e21bb4106b5bf"
 _maxNumRetries = 10
 subscription_key = "c49df94e6fc84d3a93768d94524f0007"
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 def processRequest( json, data, headers, params ):
     retries = 0
@@ -205,7 +207,7 @@ def show_result_on_image(img_path, text_with_types, inverted):
             cv2.putText(img, t[0], (t[3]['boundingBox'][0] - 10, t[3]['boundingBox'][1] + 5), font, 2, (0, 0, 255), 1, cv2.LINE_AA)
         else:
             cv2.rectangle(img, (t[2]['boundingBox'][0], t[2]['boundingBox'][1] - k), (t[3]['boundingBox'][4], t[3]['boundingBox'][5] + k), (0, 0, 255), 2)
-    cv2.imwrite('./notes_output_image.jpg', img)
+    cv2.imwrite(os.path.join(dir_path, 'notes_output_image.jpg'), img)
 
 def get_my_audio_token(subscription_key):
     fetch_token_url = "https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken"
@@ -234,7 +236,7 @@ def save_audio(access_token, text_to_be_spoken):
     body = ElementTree.tostring(xml_body)
     response = requests.post(constructed_url, headers=headers, data=body)
     if response.status_code == 200:
-        with open('notes_audio' + '.wav', 'wb') as audio:
+        with open(os.path.join(dir_path, 'notes_audio.wav'), 'wb') as audio:
             audio.write(response.content)
             # all_audio.append('sample-' + self.timestr + '.wav')
             print("\nStatus code: " + str(response.status_code) + "\nYour TTS is ready for playback.\n")
@@ -254,12 +256,15 @@ def tell_me_if_its_inverted(text_bnd_boxs_result):
         return True
     return False
 
-def note_make(url, img_path = "notes_input_img.jpg"):
+def note_make(url, img_path = "notes_input_img.jpg", just_img=False):
+    img_path = os.path.join(dir_path, img_path)
+    if just_img:
+        return os.path.join(dir_path, 'notes_output_image.jpg')
     resp = requests.get(url, stream=True)
     local_file = open(img_path, "wb")
     resp.raw.decode_content = True
     shutil.copyfileobj(resp.raw, local_file)
-    shp =  cv2.imread(img_path).shape
+    shp = cv2.imread(img_path).shape
     column_len = shp[0]
     row_len = shp[1]
     text_bnd_boxs_result = gimme_text_and_bounding_boxs(img_path)
@@ -269,6 +274,7 @@ def note_make(url, img_path = "notes_input_img.jpg"):
     text_to_be_spoken = gimme_the_final_text(text_with_types)
     access_token = get_my_audio_token(subscription_key)
     save_audio(access_token, text_to_be_spoken)
+    return os.path.join(dir_path, 'notes_audio.wav')
 
 if __name__ == "__main__":
     url = "https://imgur.com/download/jwiBl0z"

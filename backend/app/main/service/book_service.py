@@ -80,7 +80,7 @@ def getOCRTextResult( operationLocation, headers ):
 def showResultinFile(result):
 	lines = result['recognitionResult']['lines']
 	texty = ""
-	for i in range(len(lines)):
+	for i in range(len(lines)-1):
 		words = lines[i]['words']
 		s = ""
 		for word in words:
@@ -253,57 +253,9 @@ def narrate_book_parse(url, sound=False):     #This function returns text from t
 		return combine_all_audio()
 	return all_text
 
-def narrate_book(url, sound = False):
-	global i
-	filename = "pdfExample.pdf"
-	r = requests.get(url, allow_redirects=True, stream=True)
-	with open(filename, 'wb') as f:
-		for chunk in r.iter_content():
-			f.write(chunk)
-
-	images = pdf2image.convert_from_path(filename)
-	print(len(images))
-	all_text = ""
-	for image in images:
-		image_data = pil_to_array(image)
-		new_page = text_from_image(image_data)
-		all_text += new_page
-		if sound:
-			i += 1
-			app = TextToSpeech(new_page, subscription_key)
-			app.get_token()
-			app.save_audio()
-			# return combine_all_audio()
-
-	i = 0
-	if sound:
-		return combine_all_audio()
-	return all_text
-
-
-def combine_all_audio():
-	global all_audio
-	dir_path = os.path.dirname(os.path.realpath(__file__))
-	data = []
-	outfile = os.path.join(dir_path, "narration.wav")
-	for infile in all_audio:
-		w = wave.open(infile, 'rb')
-		data.append([w.getparams(), w.readframes(w.getnframes())])
-		w.close()
-
-	print('audio elements = '+str(len(data)))
-
-	output = wave.open(outfile, 'wb')
-	output.setparams(data[0][0])
-	for data_ele in data:
-		output.writeframes(data_ele[1])
-	output.close()
-	all_audio = []
-	return outfile
-
 def slow_down_audio(audio_file, Change_RATE):
 	dir_path = os.path.dirname(os.path.realpath(__file__))
-	outfile = os.path.join(dir_path, "mod_narration.wav")
+	outfile = os.path.join(dir_path, "narration.wav")
 	CHANNELS = 1
 	swidth = 2
 	# Change_RATE = 2
@@ -320,8 +272,56 @@ def slow_down_audio(audio_file, Change_RATE):
 	wf.close()
 	return outfile
 
+def narrate_book(url, sound = False):
+	global i
+	filename = "pdfExample.pdf"
+	r = requests.get(url, allow_redirects=True, stream=True)
+	with open(filename, 'wb') as f:
+		for chunk in r.iter_content():
+			f.write(chunk)
+
+	images = pdf2image.convert_from_path(filename)
+	print(len(images))
+	all_text = ""
+	new_page = "Chapter 1 \n"
+	for image in images:
+		image_data = pil_to_array(image)
+		new_page += text_from_image(image_data)
+
+		all_text += new_page
+		if sound:
+			i += 1
+			app = TextToSpeech(new_page, subscription_key)
+			app.get_token()
+			app.save_audio()
+
+	i = 0
+	if sound:
+		return slow_down_audio(combine_all_audio(), 0.95)
+	return all_text
+
+
+def combine_all_audio():
+	global all_audio
+	dir_path = os.path.dirname(os.path.realpath(__file__))
+	data = []
+	outfile = os.path.join(dir_path, "narration_1.wav")
+	for infile in all_audio:
+		w = wave.open(infile, 'rb')
+		data.append([w.getparams(), w.readframes(w.getnframes())])
+		w.close()
+
+	print('audio elements = '+str(len(data)))
+
+	output = wave.open(outfile, 'wb')
+	output.setparams(data[0][0])
+	for data_ele in data:
+		output.writeframes(data_ele[1])
+	output.close()
+	all_audio = []
+	return outfile
+
 if __name__ == "__main__":
-	url = "https://arxiv.org/pdf/1601.07255.pdf"
-	url = "https://arxiv.org/pdf/1805.08786.pdf"
+	url = "https://github.com/hackabit19/Apes_together_strong/raw/master/backend/pdfExample.pdf"
 	all_audio = narrate_book(url, True)   #If you only want text, give second arg False
 	# slow_down_audio(all_audio, 0.9)
