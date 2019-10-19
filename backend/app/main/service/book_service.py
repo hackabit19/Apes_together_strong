@@ -230,7 +230,7 @@ def extractPdfText(filePath=''):
 
     return text
 
-def narrate_book(url, sound=False):     #This function returns text from the book.
+def narrate_book_parse(url, sound=False):     #This function returns text from the book.
 	global i
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 	filename = "pdfExample.pdf"
@@ -253,7 +253,7 @@ def narrate_book(url, sound=False):     #This function returns text from the boo
 		return combine_all_audio()
 	return all_text
 
-def narrate_book_OCR(url, sound = False):
+def narrate_book(url, sound = False):
 	global i
 	filename = "pdfExample.pdf"
 	r = requests.get(url, allow_redirects=True, stream=True)
@@ -324,4 +324,4 @@ if __name__ == "__main__":
 	url = "https://arxiv.org/pdf/1601.07255.pdf"
 	url = "https://arxiv.org/pdf/1805.08786.pdf"
 	all_audio = narrate_book(url, True)   #If you only want text, give second arg False
-	#slow_down_audio(all_audio, 0.9)
+	# slow_down_audio(all_audio, 0.9)
