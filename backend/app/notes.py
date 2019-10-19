@@ -87,6 +87,7 @@ def gimme_proper_text(text_bnd_boxs_result, column_len, row_len):
     my_str = []
     k = 0
     # begin_bullets = -1
+    ymax = 0
     for i in range(len(lines)):
         line_str = ""
         words = lines[i]['words']
@@ -98,7 +99,7 @@ def gimme_proper_text(text_bnd_boxs_result, column_len, row_len):
             br = (words[j]['boundingBox'][4], words[j]['boundingBox'][5])
             bl = (words[j]['boundingBox'][6], words[j]['boundingBox'][7])
             text = words[j]['text']
-            # print(tl)
+            print(tl)
             line_str += " " + text + " "
             font_size = math.sqrt((tl[0] - bl[0]) * (tl[0] - bl[0]) + (tl[1] - bl[1]) * (tl[1] - bl[1]))
             font_size += math.sqrt((tr[0] - br[0]) * (tr[0] - br[0]) + (tr[1] - br[1]) * (tr[1] - br[1]))
@@ -113,8 +114,9 @@ def gimme_proper_text(text_bnd_boxs_result, column_len, row_len):
                 this_head = True
                 break
             if k != 0 and this_head != True and (text.strip() in [':', '>', '='] or (prev_mag > font_size and (font_size - prev_mag) / font_size > 0.2)):
-                my_str.append(["subtitle", line_str])
-                line_str = ""
+                if len(line_str.split()) < 6: 
+                    my_str.append(["subtitle", line_str, words[0], words[j]])
+                    line_str = ""
             if this_head == False and font_size > prev_mag:
                 prev_mag = font_size
             if len(words) >=2 and j == 0:
@@ -123,34 +125,42 @@ def gimme_proper_text(text_bnd_boxs_result, column_len, row_len):
                     tx = text +  words[1]['text'] +  words[2]['text']
                     tx.replace(" ", "")
                     if tx[2] == ')' or tx[3] == ')':
-                        my_str.append(["bullet_begin"])
+                        my_str.append(["bullet_begin", words[j]])
                 elif len(text) <=2 and (text.isnumeric() or text.isalpha()):
                     # print("I am here", text[0])
                     if text[0].isnumeric():
                         tx = text + words[1]['text']
                         tx.replace(" ", "")
                         if tx[1] == '.' or tx[1] == ')':
-                            my_str.append(["bullet_begin"])
+                            my_str.append(["bullet_begin", words[j]])
                     elif text[0] in ['a', 'b']:
                         tx = text + words[1]['text']
                         tx.replace(" ", "")
                         if tx[1] == '.' or tx[1] == ')':
-                            my_str.append(["bullet_begin"])
+                            my_str.append(["bullet_begin", words[j]])
                         # check subsequent lettrs
                     elif text[0] == 'i':
                         tx = text + words[1]['text']
                         tx.replace(" ", "")
                         if tx[1] == '.' or tx[1] == ')':
-                            my_str.append(["bullet_begin"])
+                            my_str.append(["bullet_begin", words[j]])
                         # check subsequent lettrs
         if this_head == True:
             if k == 0:
-                my_str.append(["title", line_str])
+                my_str.append(["title", line_str, words[0], words[len(words) - 1]])
                 k = 1
-            else:
-                my_str.append(["subtitle", line_str])
-        elif len(line_str) != 0:
-            my_str.append(["normal", line_str.strip()])
+            elif words[0]['boundingBox'][1] > ymax and len(line_str.split()) < 6:
+                my_str.append(["subtitle", line_str, words[0], words[len(words) - 1]])
+        if len(line_str) != 0:
+            my_str.append(["normal", line_str.strip(), words[0], words[len(words) - 1]])
+        i1 = words[0]['boundingBox'][5]
+        i2 = words[0]['boundingBox'][7]
+        _ymax = i2
+        if i1 > i2:
+            _ymax = i1
+        if _ymax > ymax:
+            ymax = _ymax
+    print([(item[0], item[1]) for item in my_str])
     return my_str
 
 def gimme_the_final_text(text_with_types):
@@ -167,6 +177,19 @@ def gimme_the_final_text(text_with_types):
         else:
             text_to_be_spoken += text_block[1]
     return text_to_be_spoken
+
+def show_result_on_image(img_path, text_with_types):
+    img = cv2.imread(img_path)
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    for t in text_with_types:
+        if t[0] == "bullet_begin":
+            cv2.putText(img, "bullet", (t[1]['boundingBox'][0] - 50, t[1]['boundingBox'][1]), font, 1, (0, 0, 255), 1, cv2.LINE_AA)
+        elif t[0] != "normal":
+            cv2.rectangle(img, (t[2]['boundingBox'][0], t[2]['boundingBox'][1] - 15), (t[3]['boundingBox'][4], t[3]['boundingBox'][5] + 15), (0, 0, 255), 2)
+            cv2.putText(img, t[0], (t[3]['boundingBox'][0] - 10, t[3]['boundingBox'][1] + 5), font, 2, (0, 0, 255), 1, cv2.LINE_AA)
+        else:
+            cv2.rectangle(img, (t[2]['boundingBox'][0], t[2]['boundingBox'][1] - 15), (t[3]['boundingBox'][4], t[3]['boundingBox'][5] + 15), (0, 0, 255), 2)
+    cv2.imwrite('./MODIfied.jpg', img)
 
 def get_my_audio_token(subscription_key):
     fetch_token_url = "https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken"
@@ -213,6 +236,7 @@ def note_make(url, img_path = "sample.jpg"):
     row_len = shp[1]
     text_bnd_boxs_result = gimme_text_and_bounding_boxs(img_path)
     text_with_types = gimme_proper_text(text_bnd_boxs_result, column_len, row_len)
+    show_result_on_image(img_path, text_with_types)
     text_to_be_spoken = gimme_the_final_text(text_with_types)
     access_token = get_my_audio_token(subscription_key)
     save_audio(access_token, text_to_be_spoken)
