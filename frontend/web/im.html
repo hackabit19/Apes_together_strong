@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>ConnectAll - Take Notes</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+
+		<link rel="stylesheet" href="assets/css/im.css" />
+	</head>
+	<body class="is-preload">
+
+		<!-- Page Wrapper -->
+			<div id="page-wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<h1><a href="index.html">Connect All</a></h1>
+						<nav id="nav">
+							<ul>
+								<li class="special">
+									<a href="#menu" class="menuToggle"><span>Menu</span></a>
+									<div id="menu">
+										<ul>
+											<li><a href="index.html">Home</a></li>
+											<li><a href="sign.html">Sign Language</a></li>
+											<li><a href="im.html">Instant Communication</a></li>
+											<li><a href="narration.html">Narration</a></li>
+											<li><a href="notes.html">Note Taking</a></li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</nav>
+					</header>
+
+				<!-- Main -->
+					<article id="main">
+						<header>
+							<h2>Instant Messaging for all</h2>
+							<p>Communication beyond all barriers.</p>
+						</header>
+						<section class="wrapper style5">
+							<div class="inner">
+								  <div class="container">
+							    <div class="row " style="padding-top:40px;">
+							      <h3 class="text-center">ConnectAll</h3>
+							      <br/><br/>
+							      <div id="viz">
+							            <canvas id="analyser" width="1024" height="500"></canvas>
+							            <div class="panel-heading">
+							            <strong><span class="glyphicon glyphicon-list"></span> Audio History</strong>
+							          </div>
+							            <div id="wavedisplay">
+							                <div id="wavefiles">
+							                </div>
+							            </div>
+							        </div>
+							      <div class="col-md-12">
+							        <div class="panel panel-info">
+							          <div class="panel-heading">
+							            <strong><span class="glyphicon glyphicon-list"></span> Chat History</strong>
+							          </div>
+							          <div id="id1" class="panel-body fixed-panel">
+							            <ul class="media-list">
+							            </ul>
+							          </div>
+							          <div class="panel-footer">
+							            <div class="input-group">
+							              <input type="text" class="form-control" placeholder="Enter Message" id="messageText" autofocus/>
+							              <span class="input-group-btn">
+							                <button class="btn btn-info" type="button" id="sendMessage">SEND <span class="glyphicon glyphicon-send"></span></button>
+							                <button class="btn btn-info" type="button" id="record" onclick="toggleRecording(this);">RECORD <span class="glyphicon glyphicon-send"></span></button>
+							              </span>
+							            </div>
+							          </div>
+							        </div>
+							      </div>
+							    </div>
+							  </div>
+							</div>
+						</section>
+					</article>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<ul class="icons">
+							<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+							<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+							<li><a href="#" class="icon brands fa-dribbble"><span class="label">Dribbble</span></a></li>
+							<li><a href="#" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+						</ul>
+						<ul class="copyright">
+							<li>&copy; Apes_Strong_Together</li><li> 2019 <a href="http://hackabit.in">Hack_A_Bit</a></li>
+						</ul>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+			<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+			<script src="assets/js/audio.js"></script>
+			<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.4.0/jquery.timeago.min.js"></script>
+			<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+
+	</body>
+</html>
