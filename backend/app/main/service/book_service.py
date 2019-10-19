@@ -1,3 +1,4 @@
+import os
 import requests
 import pdf2image
 import PyPDF2
@@ -205,19 +206,23 @@ def narrate_book(url, sound=False):     #This function returns text from the boo
 	return all_text
 
 def combine_all_audio():
+	global all_audio
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 	data = []
 	outfile = os.path.join(dir_path, "narration.wav")
 	for infile in all_audio:
 		w = wave.open(infile, 'rb')
-		data.append( [w.getparams(), w.readframes(w.getnframes())] )
+		data.append([w.getparams(), w.readframes(w.getnframes())])
 		w.close()
+
+	print('audio elements = '+str(len(data)))
 
 	output = wave.open(outfile, 'wb')
 	output.setparams(data[0][0])
-	output.writeframes(data[0][1])
-	output.writeframes(data[1][1])
+	for data_ele in data:
+		output.writeframes(data_ele[1])
 	output.close()
+	all_audio = []
 	return outfile
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, request
+from flask import Blueprint, current_app, request, send_file
 from flask_restplus import Api, Resource, Namespace
 from app.main.service.book_service import narrate_book
 
@@ -18,7 +18,7 @@ class BookInText(Resource):
 @book_api.route('/getNarration')
 class BookNarration(Resource):
     def get(self):
-        path_to_audio = narrate_book(request.args.get('url'))
+        path_to_audio = narrate_book(request.args.get('url'), sound=True)
         response = send_file(path_to_audio, "audio/wav", attachment_filename='narration.wav', as_attachment=True)
         response.headers["x-filename"] = 'narration.wav'
         response.headers["Access-Control-Expose-Headers"] = 'x-filename'
