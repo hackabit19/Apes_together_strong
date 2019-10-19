@@ -86,6 +86,7 @@ def gimme_proper_text(text_bnd_boxs_result, column_len, row_len):
     lines = text_bnd_boxs_result['recognitionResult']['lines']
     my_str = []
     k = 0
+    # begin_bullets = -1
     for i in range(len(lines)):
         line_str = ""
         words = lines[i]['words']
@@ -97,8 +98,8 @@ def gimme_proper_text(text_bnd_boxs_result, column_len, row_len):
             br = (words[j]['boundingBox'][4], words[j]['boundingBox'][5])
             bl = (words[j]['boundingBox'][6], words[j]['boundingBox'][7])
             text = words[j]['text']
-            print(tl)
-            line_str += " " + text
+            # print(tl)
+            line_str += " " + text + " "
             font_size = math.sqrt((tl[0] - bl[0]) * (tl[0] - bl[0]) + (tl[1] - bl[1]) * (tl[1] - bl[1]))
             font_size += math.sqrt((tr[0] - br[0]) * (tr[0] - br[0]) + (tr[1] - br[1]) * (tr[1] - br[1]))
             font_size = font_size / 2
@@ -116,6 +117,32 @@ def gimme_proper_text(text_bnd_boxs_result, column_len, row_len):
                 line_str = ""
             if this_head == False and font_size > prev_mag:
                 prev_mag = font_size
+            if len(words) >=2 and j == 0:
+                text = text.strip()
+                if len(words) > 3 and text[0] == '(':
+                    tx = text +  words[1]['text'] +  words[2]['text']
+                    tx.replace(" ", "")
+                    if tx[2] == ')' or tx[3] == ')':
+                        my_str.append(["bullet_begin"])
+                elif len(text) <=2 and (text.isnumeric() or text.isalpha()):
+                    # print("I am here", text[0])
+                    if text[0].isnumeric():
+                        tx = text + words[1]['text']
+                        tx.replace(" ", "")
+                        if tx[1] == '.' or tx[1] == ')':
+                            my_str.append(["bullet_begin"])
+                    elif text[0] in ['a', 'b']:
+                        tx = text + words[1]['text']
+                        tx.replace(" ", "")
+                        if tx[1] == '.' or tx[1] == ')':
+                            my_str.append(["bullet_begin"])
+                        # check subsequent lettrs
+                    elif text[0] == 'i':
+                        tx = text + words[1]['text']
+                        tx.replace(" ", "")
+                        if tx[1] == '.' or tx[1] == ')':
+                            my_str.append(["bullet_begin"])
+                        # check subsequent lettrs
         if this_head == True:
             if k == 0:
                 my_str.append(["title", line_str])
@@ -135,6 +162,8 @@ def gimme_the_final_text(text_with_types):
         elif text_block[0] == "subtitle":
             text_to_be_spoken += ". The subtitle is"
             text_to_be_spoken += text_block[1] + ".\n "
+        elif text_block[0] == "bullet_begin":
+            text_to_be_spoken += ". Begin of the next point: "
         else:
             text_to_be_spoken += text_block[1]
     return text_to_be_spoken
