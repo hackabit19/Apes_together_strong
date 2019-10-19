@@ -8,6 +8,7 @@ import io
 import time
 import cv2
 import operator
+import requests
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D 
@@ -182,12 +183,12 @@ class TextToSpeech(object):
 		else:
 			print("\nStatus code: " + str(response.status_code) + "\nSomething went wrong. Check your subscription key and headers.\n")
 
-def narrate_book(url):     #This function returns text from the book.
-	content = urllib.request.urlopen(url).read()
+def narrate_book(url, sound=False):     #This function returns text from the book.
 	filename = "pdfExample.pdf"
-	fout = open(filename, "wb")
-	fout.write(content)
-	fout.close()
+	r = requests.get(url, allow_redirects=True, stream=True)
+	with open(filename, 'wb') as f:
+		for chunk in r.iter_content():
+			f.write(chunk)
 
 	images = pdf2image.convert_from_path(filename)
 	print(len(images))
@@ -196,14 +197,17 @@ def narrate_book(url):     #This function returns text from the book.
 		image_data = pil_to_array(image)
 		new_page = text_from_image(image_data)
 		all_text += new_page
-		app = TextToSpeech(new_page, subscription_key)
-		app.get_token()
-		app.save_audio()
+		if sound:
+			app = TextToSpeech(new_page, subscription_key)
+			app.get_token()
+			app.save_audio()
+			return combine_all_audio()
 	return all_text
 
 def combine_all_audio():
+	dir_path = os.path.dirname(os.path.realpath(__file__))
 	data = []
-	outfile = "narration.wav"
+	outfile = os.path.join(dir_path, "narration.wav")
 	for infile in all_audio:
 		w = wave.open(infile, 'rb')
 		data.append( [w.getparams(), w.readframes(w.getnframes())] )
@@ -214,6 +218,7 @@ def combine_all_audio():
 	output.writeframes(data[0][1])
 	output.writeframes(data[1][1])
 	output.close()
+	return outfile
 
 if __name__ == "__main__":
 	url = "https://arxiv.org/pdf/1601.07255.pdf"
