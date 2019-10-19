@@ -70,7 +70,7 @@ class ZulipBot(object):
 				})
 			pass
 
-		if content[0].lower() == "bhatbot" or content[0] == "@**bhatbot**":
+		if content[0].lower() == "ConnectAll" or content[0] == "@**ConnectAll**":
 			if len(content) != 3 :
 				message = "Sorry! I don't understand."
 				self.client.send_message({
