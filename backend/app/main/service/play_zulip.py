@@ -106,9 +106,17 @@ class ZulipBot(object):
 
 
 
-
                 if command_type == "create_signs":
                     pass
+
+            else:
+                message = "Sorry! I don't understand."
+                self.client.send_message({
+                    "type": "stream",
+                    "subject": msg["subject"],
+                    "to": msg["display_recipient"],
+                    "content": message
+                })
 
 def main():
     bot = ZulipBot()
