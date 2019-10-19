@@ -40,7 +40,7 @@ class Download(Resource):
 class NotesToAudioWeb(Resource):
     def get(self):
         aud_path = note_make(request.args.get('url'))
-        with open(aud_path, 'rb', encoding='utf-8') as audio_file:
+        with open(aud_path, 'rb') as audio_file:
             encoded_audio = base64.b64encode(audio_file.read())
         img_path  = note_make(just_img=True)
         print(img_path)
