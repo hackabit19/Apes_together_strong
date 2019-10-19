@@ -1,4 +1,4 @@
-/* Audio recording and streaming demo by Miguel Grinberg.
+  /* Audio recording and streaming demo by Miguel Grinberg.
 
    Adapted from https://webaudiodemos.appspot.com/AudioRecorder
    Copyright 2013 Chris Wilson
@@ -26,9 +26,7 @@ var audioInput = null,
 var rafID = null;
 var analyserContext = null;
 var canvasWidth, canvasHeight;
-var socketio = io.connect(location.origin + '/audio', {transports: ['websocket']});
-
-var channel = "/chat";
+var socket = io.connect(location.origin + '/chat', {transports: ['websocket']});
 var receivedMsg;
 // texting
 socket.on('connect', function () {
@@ -41,6 +39,7 @@ console.log("chat disconnected");
 
 socket.on("message", function (message) {
     receivedMsg = message;
+    console.log(message);
     refreshMessages(message);
     scrollToBottom();
   });
@@ -72,6 +71,7 @@ function sendMessage() {
     var message = $("#messageText").val();
     var author = $.cookie("realtime-chat-nickname");
     socket.emit('message', { data: { message: message, author: author } });
+    socket.emit('chat-to-aud', message);
     $("#messageText").val("");
     $container.animate({ scrollTop: $container[0].scrollHeight }, "slow");
     scrollToBottom();
@@ -84,7 +84,7 @@ function scrollToBottom() {
 
 // AUDIO
 
-socketio.on('add-wavefile', function(url) {
+socket.on('add-wavefile', function(url) {
     // add new recording to page
     audio = document.createElement('p');
     audio.innerHTML = '<audio src="' + url + '" controls>';
@@ -96,12 +96,12 @@ function toggleRecording( e ) {
         // stop recording
         e.classList.remove('recording');
         recording = false;
-        socketio.emit('end-recording');
+        socket.emit('end-recording');
     } else {
         // start recording
         e.classList.add('recording');
         recording = true;
-        socketio.emit('start-recording', {numChannels: 1, bps: 16, fps: parseInt(audioContext.sampleRate)});
+        socket.emit('start-recording', {numChannels: 1, bps: 16, fps: parseInt(audioContext.sampleRate)});
     }
 }
 
@@ -198,7 +198,7 @@ function gotStream(stream) {
                 var s = Math.max(-1, Math.min(1, input[i]));
                 output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
             }
-            socketio.emit('write-audio', buffer);
+            socket.emit('write-audio', buffer);
         }
     }
     inputPoint.connect(scriptNode);
