@@ -14,6 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D 
 import json
+from tika import parser
 from xml.etree import ElementTree
 
 def pil_to_array(pil_image):
@@ -213,7 +214,46 @@ class TextToSpeech(object):
 		else:
 			print("\nStatus code: " + str(response.status_code) + "\nSomething went wrong. Check your subscription key and headers.\n")
 
+def extractPdfText(filePath=''):
+    fileObject = open(filePath, 'rb')
+    pdfFileReader = PyPDF2.PdfFileReader(fileObject)
+    totalPageNumber = pdfFileReader.numPages
+    print('This pdf file contains totally ' + str(totalPageNumber) + ' pages.')
+
+    currentPageNumber = 0
+    text = []
+    while(currentPageNumber < totalPageNumber ):
+        pdfPage = pdfFileReader.getPage(currentPageNumber)
+
+        text.append(pdfPage.extractText())
+        currentPageNumber += 1
+
+    return text
+
 def narrate_book(url, sound=False):     #This function returns text from the book.
+	global i
+	dir_path = os.path.dirname(os.path.realpath(__file__))
+	filename = "pdfExample.pdf"
+	filePath = os.path.join(dir_path, filename)
+	r = requests.get(url, allow_redirects=True, stream=True)
+	with open(filename, 'wb') as f:
+		for chunk in r.iter_content():
+			f.write(chunk)
+
+	all_pages = extractPdfText(filePath)
+	all_text = ""
+	for page in all_pages:
+		i += 1
+		all_text += page
+		app = TextToSpeech(page, subscription_key)
+		app.get_token()
+		app.save_audio()
+	i = 0
+	if sound:
+		return combine_all_audio()
+	return all_text
+
+def narrate_book_OCR(url, sound = False):
 	global i
 	filename = "pdfExample.pdf"
 	r = requests.get(url, allow_redirects=True, stream=True)
@@ -239,6 +279,7 @@ def narrate_book(url, sound=False):     #This function returns text from the boo
 	if sound:
 		return combine_all_audio()
 	return all_text
+
 
 def combine_all_audio():
 	global all_audio
@@ -268,7 +309,7 @@ def slow_down_audio(audio_file, Change_RATE):
 	# Change_RATE = 2
 
 	spf = wave.open(audio_file, 'rb')
-	RATE=spf.getframerate()
+	RATE = spf.getframerate()
 	signal = spf.readframes(-1)
 
 	wf = wave.open(outfile, 'wb')
