@@ -1,7 +1,7 @@
 from flask import Blueprint, current_app, request, send_file
 from flask_restplus import Api, Resource, Namespace
 from app.main.service.book_service import narrate_book
-
+import base64
 book_api = Namespace('book', description="Book endpoint")
 
 @book_api.route('/')
@@ -24,3 +24,10 @@ class BookNarration(Resource):
         response.headers["Access-Control-Expose-Headers"] = 'x-filename'
         return response
 
+@book_api.route('/web')
+class BookNarrationWebAccess(Resource):
+    def get(self):
+        path_to_audio = narrate_book(request.args.get('url'), sound=True)
+        with open(path_to_audio, 'rb') as audio_file:
+            encoded_image = base64.b64encode(audio_file.read())
+        return {'audio': encoded_image.decode('utf-8')}

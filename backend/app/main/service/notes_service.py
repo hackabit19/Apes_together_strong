@@ -256,7 +256,7 @@ def tell_me_if_its_inverted(text_bnd_boxs_result):
         return True
     return False
 
-def note_make(url, img_path = "notes_input_img.jpg", just_img=False):
+def note_make(url=None, img_path = "notes_input_img.jpg", just_img=False):
     img_path = os.path.join(dir_path, img_path)
     if just_img:
         return os.path.join(dir_path, 'notes_output_image.jpg')
