@@ -154,6 +154,7 @@ def text_from_image(image_data):
 subscription_key = "c49df94e6fc84d3a93768d94524f0007"
 
 all_audio = []
+i = 0
 # Here you have to paste the key for azure speech api
 class TextToSpeech(object):
 	def __init__(self, to_be_spoken, subscription_key):
@@ -171,6 +172,7 @@ class TextToSpeech(object):
 		self.access_token = str(response.text)
 
 	def save_audio(self):
+		global i
 		base_url = 'https://westus.tts.speech.microsoft.com/'
 		path = 'cognitiveservices/v1'
 		constructed_url = base_url + path
@@ -190,10 +192,10 @@ class TextToSpeech(object):
 
 		response = requests.post(constructed_url, headers=headers, data=body)
 		if response.status_code == 200:
-			with open('sample-' + self.timestr + '.wav', 'wb') as audio:
+			with open('sample-' + str(i) + '.wav', 'wb') as audio:
 				audio.write(response.content)
-				all_audio.append('sample-' + self.timestr + '.wav')
-				print("\nStatus code: " + str(response.status_code) + "\nYour TTS is ready for playback.\n")
+				all_audio.append('sample-' + str(i) + '.wav')
+				print("\nStatus code: " + str(response.status_code) + "\nYour TTS is ready for playback.\n" + 'sample-' + str(i) + '.wav')
 		else:
 			print("\nStatus code: " + str(response.status_code) + "\nSomething went wrong. Check your subscription key and headers.\n")
 			print("Reason: " + str(response.reason) + "\n")
@@ -212,6 +214,7 @@ class TextToSpeech(object):
 			print("\nStatus code: " + str(response.status_code) + "\nSomething went wrong. Check your subscription key and headers.\n")
 
 def narrate_book(url, sound=False):     #This function returns text from the book.
+	global i
 	filename = "pdfExample.pdf"
 	r = requests.get(url, allow_redirects=True, stream=True)
 	with open(filename, 'wb') as f:
@@ -226,10 +229,13 @@ def narrate_book(url, sound=False):     #This function returns text from the boo
 		new_page = text_from_image(image_data)
 		all_text += new_page
 		if sound:
+			i += 1
 			app = TextToSpeech(new_page, subscription_key)
 			app.get_token()
 			app.save_audio()
 			# return combine_all_audio()
+
+	i = 0
 	if sound:
 		return combine_all_audio()
 	return all_text
@@ -275,5 +281,6 @@ def slow_down_audio(audio_file, Change_RATE):
 
 if __name__ == "__main__":
 	url = "https://arxiv.org/pdf/1601.07255.pdf"
+	url = "https://arxiv.org/pdf/1805.08786.pdf"
 	all_audio = narrate_book(url, True)   #If you only want text, give second arg False
 	#slow_down_audio(all_audio, 0.9)
