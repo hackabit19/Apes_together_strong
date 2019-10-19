@@ -88,6 +88,34 @@ def showResultinFile(result):
 		texty += s
 	return texty
 
+def showResultOnImage( result, img ):
+	img = img[:, :, (2, 1, 0)]
+	fig, ax = plt.subplots(figsize=(12, 12))
+	ax.imshow(img, aspect='equal')
+
+	lines = result['recognitionResult']['lines']
+
+	for i in range(len(lines)):
+		words = lines[i]['words']
+		for j in range(len(words)):
+			tl = (words[j]['boundingBox'][0], words[j]['boundingBox'][1])
+			tr = (words[j]['boundingBox'][2], words[j]['boundingBox'][3])
+			br = (words[j]['boundingBox'][4], words[j]['boundingBox'][5])
+			bl = (words[j]['boundingBox'][6], words[j]['boundingBox'][7])
+			text = words[j]['text']
+			x = [tl[0], tr[0], tr[0], br[0], br[0], bl[0], bl[0], tl[0]]
+			y = [tl[1], tr[1], tr[1], br[1], br[1], bl[1], bl[1], tl[1]]
+			line = Line2D(x, y, linewidth=3.5, color='red')
+			ax.add_line(line)
+			ax.text(tl[0], tl[1] - 2, '{:s}'.format(text),
+			bbox=dict(facecolor='blue', alpha=0.5),
+			fontsize=14, color='white')
+
+	plt.axis('off')
+	plt.tight_layout()
+	plt.draw()
+	plt.show()
+
 def text_from_image(image_data):
 	params = {'mode' : 'Handwritten'}
 	headers = dict()
@@ -97,7 +125,7 @@ def text_from_image(image_data):
 	json = None
 
 	operationLocation = processRequest(json, image_data, headers, params)
-	print("Baahar")
+
 	result = None
 	if (operationLocation != None):
 		headers = {}
@@ -106,15 +134,14 @@ def text_from_image(image_data):
 			time.sleep(1)
 			print("Trying")
 			result = getOCRTextResult(operationLocation, headers)
-			print("Nikal Lawde")
 			if result['status'] == 'Succeeded' or result['status'] == 'Failed':
 				break
 	text_file = []
 	if result is not None and result['status'] == 'Succeeded':
 		data8uint = np.fromstring(image_data, np.uint8)
 		img = cv2.cvtColor(cv2.imdecode(data8uint, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
+		# showResultOnImage(result, img)
 		return showResultinFile(result)
-	# 	# showResultOnImage(result, img)
 	# 	all_text = result['recognitionResult']['lines']
 	# 	for i in range(len(all_text)):
 	# 		one_line = all_text[i]['words']
@@ -202,7 +229,9 @@ def narrate_book(url, sound=False):     #This function returns text from the boo
 			app = TextToSpeech(new_page, subscription_key)
 			app.get_token()
 			app.save_audio()
-			return combine_all_audio()
+			# return combine_all_audio()
+	if sound:
+		return combine_all_audio()
 	return all_text
 
 def combine_all_audio():
@@ -225,7 +254,26 @@ def combine_all_audio():
 	all_audio = []
 	return outfile
 
+def slow_down_audio(audio_file, Change_RATE):
+	dir_path = os.path.dirname(os.path.realpath(__file__))
+	outfile = os.path.join(dir_path, "mod_narration.wav")
+	CHANNELS = 1
+	swidth = 2
+	# Change_RATE = 2
+
+	spf = wave.open(audio_file, 'rb')
+	RATE=spf.getframerate()
+	signal = spf.readframes(-1)
+
+	wf = wave.open(outfile, 'wb')
+	wf.setnchannels(CHANNELS)
+	wf.setsampwidth(swidth)
+	wf.setframerate(RATE*Change_RATE)
+	wf.writeframes(signal)
+	wf.close()
+	return outfile
+
 if __name__ == "__main__":
 	url = "https://arxiv.org/pdf/1601.07255.pdf"
-	all_text = narrate_book(url)
-	combine_all_audio()
+	all_audio = narrate_book(url, True)   #If you only want text, give second arg False
+	slow_down_audio(all_audio, 0.7)
