@@ -16,9 +16,10 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 def func(url_to_audio=None):
 
     if url_to_audio is not None:
-        r = requests.get(url_to_audio)
+        r = requests.get(url_to_audio, allow_redirects=True, stream=True)
         with open(os.path.join(dir_path, 'test.wav'), 'wb') as f:
-            f.write(r.content)
+            for chunk in r.iter_content():
+                f.write(chunk)
 
     r = sr.Recognizer()
     isl_gif=['all the best', 'any questions', 'are you angry', 'are you busy', 'are you hungry', 'are you sick', 'be careful',
