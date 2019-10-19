@@ -105,9 +105,10 @@ function transcription(){
           contentType: "application/json",
           success: function(response){
           	console.log(response);
+          	$('#image_div').toggle();
           	$("#spinner").toggle();
             $("#aud_res").attr("src","data:audio/ogg;base64," + response.audio);
-            $("#img_res").attr("src","data:image/jpg;base64," + response.image);
+            $("#img_res").attr("href", back_url+"notes/download?url="+response.image);
           },
       });
     }
@@ -129,7 +130,7 @@ function narration(){
       });
 }
 
-function narration(){
+function signlang(){
   var url = $("#img_url").val();
   $("#spinner").toggle();
       $.ajax({
@@ -140,8 +141,9 @@ function narration(){
           contentType: "application/json",
           success: function(response){
             console.log(response);
+            $("#vid_res").attr("href", back_url+"sign/download?url="+response.video);
             $("#spinner").toggle();
-            $("#vid_res").attr("src","data:video/ogg;base64," + response.audio)
+            $("#vid_div").toggle();
           },
       });
 }
