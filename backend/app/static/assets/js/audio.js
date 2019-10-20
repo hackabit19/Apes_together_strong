@@ -45,8 +45,8 @@ socket.on("message", function (message) {
   });
 
   function refreshMessages(message) {
-    $(".media-list").append('<p>'
-      + message.data.message + '<br/><small>' + message.data.author + '</small></p>');
+    $(".media-list").append('<li class="media"><div class="media-body"><div class="media"><div class="media-body">'
+      + message.data.message + '<br/><small class="text-muted">' + message.data.author + '</small><hr/></div></div></div></li>');
   }
 
 $(function () {

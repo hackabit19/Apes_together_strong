@@ -10,7 +10,7 @@ LOG.info('configured logger!')
 
 
 def create_app(config_name):
-    app = Flask(__name__, template_folder="../static/templates")
+    app = Flask(__name__, template_folder="../static/templates", static_folder="../static")
     app.config.from_object(config_by_name[config_name])
     LOG.info('app loaded with configuration!')
 

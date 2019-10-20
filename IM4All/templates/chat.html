@@ -9,33 +9,30 @@
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.4.0/jquery.timeago.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
-  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
-  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="{{ url_for('static', filename='assets/js/jquery.scrollex.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/jquery.scrolly.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/browser.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/breakpoints.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/util.js') }}"></script>
+
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.css') }}" />
+		<noscript><link rel="stylesheet" href="{{ url_for('static', filename='assets/css/noscript.css') }}" /></noscript>
   <style type="text/css">
     .fixed-panel {
-      min-height: 500px;
-      max-height: 500px;
-    }
-
-    .media-list {
-      overflow: auto;
+      min-height: 600px;
+      max-height: 600px;
     }
     #id1{
       overflow: scroll;
-
+      overflow-x: hidden;
+      overflow-y: hidden;
     }
-    html { overflow: hidden; }
-    body { 
-        font: 14pt Arial, sans-serif; 
-        background: lightgrey;
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        width: 100%;
-        margin: 0 0;
-    }
-    p {
-        margin: 2px;
+    #wavedisplay{
+      overflow: scroll;
+      overflow-x: hidden;
+      overflow-y: hidden;
     }
     #analyser { 
         display: inline-block; 
@@ -44,14 +41,13 @@
         height: 45%;
         box-shadow: 0px 0px 10px blue;
     }
-    #wavedisplay { 
-        display: inline-block; 
-        background: #ffffff;
-        overflow-y: scroll;
-        width: 95%;
-        height: 45%;
-        box-shadow: 0px 0px 10px blue;
-    }
+    .container {
+    -ms-overflow-style: none;  // IE 10+
+    scrollbar-width: none;  // Firefox
+}
+.container::-webkit-scrollbar { 
+    display: none;  // Safari and Chrome
+}
     #controls {
         display: flex;
         flex-direction: row;
@@ -59,6 +55,10 @@
         justify-content: space-around;
         height: 20%;
         width: 100%;
+    }
+    #viz{
+      width: 100%;
+      height: 50%;
     }
     
     #record.recording { 
@@ -70,60 +70,105 @@
     #save, #save img { height: 10vh; }
     #save { opacity: 0.25;}
     #save[download] { opacity: 1;}
-    #viz {
-        height: 80%;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        align-items: center;
-    }
     @media (orientation: landscape) {
         body { flex-direction: row;}
         #controls { flex-direction: column; height: 100%; width: 10%;}
-        #viz { height: 100%; width: 90%;}
     }
   </style>
 
 </head>
 
-<body style="overflow:scroll;">
-  <div class="container">
-    <div class="row " style="padding-top:40px;">
-      <h3 class="text-center">ConnectAll</h3>
-      <br/><br/>
-      <div id="viz">
-            <canvas id="analyser" width="1024" height="500"></canvas>
-            <div class="panel-heading">
-            <strong><span class="glyphicon glyphicon-list"></span> Audio History</strong>
-          </div>
-            <div id="wavedisplay">
-                <div id="wavefiles">
+<body>
+  <!-- Page Wrapper -->
+			<div id="page-wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<h1><a href="index.html">Connect All</a></h1>
+						<nav id="nav">
+							<ul>
+								<li class="special">
+									<a href="#menu" class="menuToggle"><span>Menu</span></a>
+									<div id="menu">
+										<ul>
+											<li><a href="index.html">Home</a></li>
+											<li><a href="sign.html">Sign Language</a></li>
+											<li><a href="im.html">Instant Communication</a></li>
+											<li><a href="narration.html">Narration</a></li>
+											<li><a href="notes.html">Note Taking</a></li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</nav>
+					</header>
+          
+
+				<!-- Main -->
+					<article id="main">
+						<header>
+							<h2>Narration</h2>
+							<p>Text to speech narration</p>
+						</header>
+						<section id="three" class="wrapper style3 special">
+						<div class="inner">
+							<header class="major">
+								<h2>CHAT AND FLIRT</h2>
+              
+                <div id="viz">
+                    <canvas id="analyser" width="1024" height="500"></canvas>
+                    <div class="panel-heading">
+                  </div>
                 </div>
-            </div>
-        </div>
-      <div class="col-md-12">
-        <div class="panel panel-info">
-          <div class="panel-heading">
-            <strong><span class="glyphicon glyphicon-list"></span> Chat History</strong>
-          </div>
-          <div id="id1" class="panel-body fixed-panel">
-            <ul class="media-list">
-            </ul>
-          </div>
-          <div class="panel-footer">
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="Enter Message" id="messageText" autofocus/>
-              <span class="input-group-btn">
-                <button class="btn btn-info" type="button" id="sendMessage">SEND <span class="glyphicon glyphicon-send"></span></button>
-                <button class="btn btn-info" type="button" id="record" onclick="toggleRecording(this);">RECORD <span class="glyphicon glyphicon-send"></span></button>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+							</header>
+							<ul class="features">
+								<li class="icon fa-paper-plane">
+									<h3>Audio</h3>
+									<div id="wavedisplay" class="fixed-panel">
+                        <div id="wavefiles">
+                        </div>
+                    </div>
+								</li>
+								<li class="icon solid fa-laptop">
+									<h3>TEXT</h3>
+                      <div id="id1" class="panel-body fixed-panel">
+                        <div class="media-list">
+                        </div>
+                      </div>
+								</li>
+							</ul>
+              <form method="post">
+										<div class="row gtr-uniform">
+											<div class="col-8 col-12-xsmall">
+												<input type="text" placeholder="Enter Message" id="messageText"  autofocus />
+											</div>
+											<div class="col-2 col-12-xsmall ">
+												<a type="button"  id="sendMessage"class="button primary">SEND</a>
+											</div>
+                      <div class="col-2 col-12-xsmall ">
+												<a type="button" id="record" onclick="toggleRecording(this);" class="button primary">RECORD</a>
+											</div>
+										</div>
+									</form>
+						</div>
+					</section>
+					</article>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<ul class="icons">
+							<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+							<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+							<li><a href="#" class="icon brands fa-dribbble"><span class="label">Dribbble</span></a></li>
+							<li><a href="#" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+						</ul>
+						<ul class="copyright">
+							<li>&copy; Apes_Strong_Together</li><li> 2019 <a href="http://hackabit.in">Hack_A_Bit</a></li>
+						</ul>
+					</footer>
+
+			</div>
   <script src="{{ url_for('static', filename='audio.js') }}" type="text/javascript"></script>
 </body>
 
