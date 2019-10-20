@@ -27,7 +27,11 @@ The workflow for a seamless narration of books begins by obtaining text using co
 
 ### Note Taking
 
-The workflow starts with image - preprocessing and identification of skewedness and inversion of text. The text is extracted along with exact position and font size. The text is then intelligently parsed for clubbing various parts of the note under a heading / sub-heading or bullets and numbering. It then appropriately narrates the various sections of the note. The technology stack consists of Azure Vision service, OpenCV and Azure Speech service.
+The workflow starts with image - preprocessing and identification of skewedness and inversion of text. The text is extracted along with exact position and font size. The text is then intelligently parsed for clubbing various parts of the note under a heading / sub-heading or bullets and numbering.
+
+![Note Example](https://raw.githubusercontent.com/hackabit19/Apes_together_strong/master/all_inputs/notes/note_ex.png)
+
+It then appropriately narrates the various sections of the note. The technology stack consists of Azure Vision service, OpenCV and Azure Speech service.
 
 ## Frontend
 
