@@ -45,12 +45,16 @@ socket.on("message", function (message) {
   });
 
   function refreshMessages(message) {
-    $(".media-list").append('<li class="media"><div class="media-body"><div class="media"><div class="media-body">'
+    $(".media-list").append('<li class="media"><div class="media-body"><div class="media"><div class="media-body">' + message.data.author + ": "
       + message.data.message + '<br/><small class="text-muted">' + message.data.author + '</small><hr/></div></div></div></li>');
   }
 
 $(function () {
 
+$('form input').on('keypress', function(e) {
+    return e.which !== 13;
+});
+    
 if (typeof $.cookie("realtime-chat-nickname") === 'undefined') {
     window.location = "/login"
 } else {
@@ -60,6 +64,7 @@ if (typeof $.cookie("realtime-chat-nickname") === 'undefined') {
 
     $('#messageText').keyup(function (e) {
     if (e.keyCode == 13) {
+        e.preventDefault();
         sendMessage();
     }
     });
@@ -69,7 +74,7 @@ function sendMessage() {
     $container = $('.media-list');
     $container[0].scrollTop = $container[0].scrollHeight;
     var message = $("#messageText").val();
-    var author = $.cookie("realtime-chat-nickname");
+    var author = "by " + $.cookie("realtime-chat-nickname");
     socket.emit('message', { data: { message: message, author: author } });
     socket.emit('chat-to-aud', message);
     $("#messageText").val("");
