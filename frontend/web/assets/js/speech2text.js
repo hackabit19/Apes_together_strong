@@ -81,11 +81,11 @@ $('#start-record-btn').on('click', function(e) {
 		    noteContent += ' ';
 		  }
 		  recording = true;
-		  $('#start-record-btn').append("Pause Recording");
+		  $('#start-record-btn').append("Pause Note");
 		  recognition.start();
 	}
 	else{
-		$('#start-record-btn').append("Start Recording");
+		$('#start-record-btn').append("Start Note");
 		recording = false;
 		recognition.stop();
 		instructions.text('Voice recognition paused.');
