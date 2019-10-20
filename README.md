@@ -1,6 +1,11 @@
 # Connect All
 
-## Sign Language to Text and more...
+You may use this app in 3 ways -
+- Deployed with zeit - http://web.jvank.now.sh . You may use this app to access all facilities.
+- Instructions for creating a zulip-bot for the same is given below in the README.
+- The `.apk` file for downloading the _android app_ is [here](https://github.com/hackabit19/Apes_together_strong/blob/aedb58dbd0fbb05170b9d22cea2645392be80753/frontend/app-release.apk)
+
+## Sign Language to Text and more ...
 
 Sign language gives voice to the mute and is the sound for the deaf. Using deep neural networks, we convert sign language to text, aiding those unable to comprehend sign language.
 
