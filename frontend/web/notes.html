@@ -81,25 +81,35 @@
 						<div class="inner">
 							<header class="major">
 								<h2>Add link to image</h2>
-								<form method="post" action="#">
+								<form method="get" action="#">
 										<div class="row gtr-uniform">
-											<div class="col-8 col-12-xsmall">
+											<div class="col-2 col-12-xsmall"></div>
+											<div class="col-6 col-12-xsmall">
 												<input id="img_url" type="text" name="demo-name" id="demo-name" value="" placeholder="URL" />
 											</div>
-											<div class="col-4 col-12-xsmall ">
-												<a href="#" class="button primary">Upload</a>
+											<div class="col-2 col-12-xsmall ">
+												<a onclick=transcription() class="button primary">Send</a>
 											</div>
+											<div class="col-2 col-12-xsmall"></div>
 										</div>
 									</form>
+								<div id="spinner" hidden="true">
+									<div style="align-self: center;" class="lds-heart"><div></div></div>
+								</div>
 							</header>
 							<ul class="features">
 								<li class="icon fa-paper-plane">
 									<h3>IMAGE</h3>
-									<span class="image fit"><img src="images/pic01.jpg" alt="" />
+									<p>Labeled image response of the provided note</p>
+									<div id="image_div" hidden="true"><a href="" target="blank" id="img_res" class="button primary">Download Image</a></div>
+									<!-- <span class="image fit"><img id="img_res" src="images/pic01.jpg" alt="" /> -->
 								</li>
 								<li class="icon solid fa-laptop">
-									<h3>TEXT</h3>
-									<p>Augue consectetur sed interdum imperdiet et ipsum. Mauris lorem tincidunt nullam amet leo Aenean ligula consequat consequat.</p>
+									<h3>Audio</h3>
+									<p>Audio response of the provided note</p>
+									<audio id="aud_res" src="" controls>
+										Your browser does not support the audio element.
+									</audio>
 								</li>
 							</ul>
 						</div>
