@@ -5,6 +5,7 @@ import speech_recognition as sr
 import uuid
 from flask import Flask, render_template, session, request, url_for, current_app
 import wave
+import uuid
 import os
 from gtts import gTTS
 from flask_socketio import SocketIO, emit, join_room
@@ -37,11 +38,12 @@ def test_connect():
 def chat_to_aud(message):
     print(message)
     audio = gTTS(message)
-    audio.save(os.path.join(dir_path, 'static', '_files', 'message.wav'))
+    name = str(uuid.uuid1()) + ".wav"
+    audio.save(os.path.join(dir_path, 'static', '_files', name))
     print("done")
     emit('add-wavefile', url_for('static',
-                                 filename='_files/' + 'message.wav'))
-    os.remove(os.path.join(dir_path, 'static', '_files', 'message.wav'))
+                                 filename='_files/' + name), broadcast=True)
+    # os.remove(os.path.join(dir_path, 'static', '_files', 'message.wav'))
     
 @socketio.on('start-recording', namespace='/chat')
 def start_recording(options):
@@ -52,6 +54,7 @@ def start_recording(options):
     wf.setnchannels(options.get('numChannels', 1))
     wf.setsampwidth(options.get('bps', 16) // 8)
     wf.setframerate(options.get('fps', 44100))
+    
     session['wavefile'] = wf
 
 
@@ -83,7 +86,7 @@ def end_recording():
     text = getTextFromAudio(
       url_for('static', filename='_files/' + session['wavename']))
     print(text)
-    emit('message', {'data': { 'message': text, 'author': 'IM4ALL' }}, broadcast=True)
+    emit('message', {'data': { 'message': text, 'author': 'by IM4ALL' }}, broadcast=True)
     print('here')
     session['wavefile'].close()
     del session['wavefile']
