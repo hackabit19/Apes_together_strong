@@ -14,16 +14,21 @@ Open the respective link to view the rest API and test it.
 
 ### Sign Language to Text and more...
 
-Sign language gives voice to the mute and is the sound for the deaf. Using deep neural networks, we convert sign language to text, aiding those unable to comprehend sign language. 
+Sign language gives voice to the mute and is the sound for the deaf. Using deep neural networks, we convert sign language to text, aiding those unable to comprehend sign language.
+
 ![Sign Language Example](https://raw.githubusercontent.com/hackabit19/Apes_together_strong/master/backend/app/main/utils/toSignTranslator/ISL_Gifs/shall%20we%20go%20together%20tommorow.gif)
 
 ### Instant Message 4 all
 
 Real time lag-free chat is made possible by hacks at socket level.To aid the specially-abled, speech-to-text and text-to-speech is also used on the fly. Technology stack used for this is socket.io, google cloud speech API.
 
+![Instant Message 4 all](https://raw.githubusercontent.com/hackabit19/Apes_together_strong/master/all_inputs/im4all_example/im4all.png)
+
 ### Book Narration
 
 The workflow for a seamless narration of books begins by obtaining text using combination of pdf-parsing and OCR. The narration audios generated for each page is stitched together. The technology stack consists of Azure services for OCR and Audio. Apache Tika and PyPDF2 is used for parsing pdfs.
+
+![Book Narration](https://raw.githubusercontent.com/hackabit19/Apes_together_strong/master/all_inputs/books/book_ex_website.png)
 
 ### Note Taking
 
